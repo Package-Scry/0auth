@@ -40,7 +40,7 @@ app.get(`${callbackPath}:port`, async (req, res) => {
     })
 
     // TODO: add some check here
-    res.redirect(`localhost:${port}/success`)
+    res.redirect(`localhost:${port}/login/success`)
   } catch (error) {
     console.error(error);
   }
