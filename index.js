@@ -15,15 +15,22 @@ app.get("/auth/github/callback", async (req, res) => {
     client_secret: clientSecret,
     code: req.query.code,
   };
-  const opts = { headers: { accept: "application/json" } };
-  
+  const options = { headers: { accept: "application/json" } };
+
   try {
     const response = await axios.post(
       `https://github.com/login/oauth/access_token`,
       body,
-      opts
+      options
     );
-    const token = response.data.access_token;
+    const token = response.data.access_token
+    const { data } = await axios({
+      method: 'get',
+      url: `https://api.github.com/user`,
+      headers: {
+        Authorization: 'token ' + token
+      }
+    })
 
     res.json("success");
   } catch (error) {
