@@ -1,15 +1,22 @@
 const express = require("express");
 const app = express();
 const axios = require("axios");
-
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
 
-app.get("/", async (req, res) =>
-  res.redirect(`https://github.com/login/oauth/authorize?client_id=${clientId}`)
+const callbackPath = `/auth/github/callback/`;
+
+app.get("/auth/:port", async (req, res) => {
+  const { port } = req.params
+
+  res.redirect(
+    `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=http://localhost:3000${callbackPath}${port}`
+  );
+}
 );
 
-app.get("/auth/github/callback", async (req, res) => {
+app.get(`${callbackPath}:port`, async (req, res) => {
+  const { port } = req.params
   const body = {
     client_id: clientId,
     client_secret: clientSecret,
@@ -32,7 +39,8 @@ app.get("/auth/github/callback", async (req, res) => {
       }
     })
 
-    res.json("success");
+    // TODO: add some check here
+    res.redirect(`localhost:${port}/success`)
   } catch (error) {
     console.error(error);
   }
