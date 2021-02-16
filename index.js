@@ -22,7 +22,7 @@ app.get("/auth/:idSocket", async (req, res) => {
   const { idSocket } = req.params;
 
   res.redirect(
-    `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=http://localhost:3000${callbackPath}${idSocket}`
+    `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=https://package-scry.herokuapp.com${callbackPath}${idSocket}`
   );
 });
 
