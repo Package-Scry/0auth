@@ -10,6 +10,9 @@
     "type": "git",
     "url": "git+https://github.com/Package-Scry/0auth.git"
   },
+  "scripts": {
+    "start": "node index.js"
+  },
   "author": "Kristof Szollosi",
   "license": "ISC",
   "bugs": {
