@@ -1,22 +1,33 @@
 const express = require("express");
 const app = express();
 const axios = require("axios");
+const server = require("http").createServer(app);
+const io = require("socket.io")(server);
 
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
 
 const callbackPath = `/auth/github/callback/`;
 
-app.get("/auth/:port", async (req, res) => {
-  const { port } = req.params;
+io.on("connection", (socket) => {
+  const id = socket.id;
+  console.log(`client ${id} connected`);
+
+  socket.join(id);
+
+  socket.on("disconnect", () => console.log(`client ${id} disconnected`));
+});
+
+app.get("/auth/:idSocket", async (req, res) => {
+  const { idSocket } = req.params;
 
   res.redirect(
-    `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=http://localhost:3000${callbackPath}${port}`
+    `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=http://localhost:3000${callbackPath}${idSocket}`
   );
 });
 
-app.get(`${callbackPath}:port`, async (req, res) => {
-  const { port } = req.params;
+app.get(`${callbackPath}:idSocket`, async (req, res) => {
+  const { idSocket } = req.params;
   const body = {
     client_id: clientId,
     client_secret: clientSecret,
@@ -40,9 +51,7 @@ app.get(`${callbackPath}:port`, async (req, res) => {
     });
 
     // TODO: add some check here
-    const url = `http://localhost:${port}/login/success`;
-
-    await axios.get(url);
+    io.to(idSocket).emit("success", data.login);
 
     return res.send("<script>window.close()</script>");
   } catch (error) {
@@ -51,4 +60,4 @@ app.get(`${callbackPath}:port`, async (req, res) => {
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log("App listening on port " + port));
+server.listen(port, () => console.log("App listening on port " + port));
