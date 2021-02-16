@@ -12,6 +12,8 @@ const callbackPath = `/auth/github/callback/`;
 io.on("connection", (socket) => {
   const id = socket.id;
   console.log(`client ${id} connected`);
+  const handshake = socket.handshake;
+  console.log(JSON.stringify(handshake, null, 2));
 
   socket.join(id);
 
