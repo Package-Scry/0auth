@@ -4,14 +4,11 @@
   "description": "0auth for package scry",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Package-Scry/0auth.git"
-  },
-  "scripts": {
-    "start": "node index.js"
   },
   "author": "Kristof Szollosi",
   "license": "ISC",
@@ -22,6 +19,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "express": "^4.17.1",
+    "express-session": "^1.17.1",
     "socket.io": "^3.1.1"
   }
 }

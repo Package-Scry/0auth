@@ -11,15 +11,18 @@ const callbackPath = `/auth/github/callback/`;
 
 io.on("connection", (socket) => {
   const id = socket.id;
+
   console.log(`client ${id} connected`);
-  const handshake = socket.handshake;
-  console.log(JSON.stringify(handshake, null, 2));
 
   socket.join(id);
-
-  socket.on("disconnect", () => console.log(`client ${id} disconnected`));
+  socket.on("disconnect", () => console.log(`client ${id} disconnected @${socket.idUser}`));
 });
 
+app.get("/isLoggedIn", async (req, res) => {
+  const isLoggedIn = !!req.user?.id
+
+  return res.json({ isLoggedIn })
+})
 app.get("/auth/:idSocket", async (req, res) => {
   const { idSocket } = req.params;
 
@@ -52,8 +55,7 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
       },
     });
 
-    // TODO: add some check here
-    io.to(idSocket).emit("success", data.login);
+    io.to(idSocket).emit("authentication", "success");
 
     return res.send("<script>window.close()</script>");
   } catch (error) {
