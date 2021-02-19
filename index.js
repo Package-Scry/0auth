@@ -1,13 +1,33 @@
 const express = require("express");
-const app = express();
+const session = require("express-session");
 const axios = require("axios");
+const redis = require("redis");
+const RedisStore = require("connect-redis")(session);
+
+const app = express();
+
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
 
+const redisClient = redis.createClient({
+  host: process.env.REDIS_HOST,
+  port: process.env.REDIS_PORT,
+  password: process.env.REDIS_PASS,
+});
+
 const callbackPath = `/auth/github/callback/`;
+
+app.use(
+  session({
+    store: new RedisStore({ client: redisClient }),
+    secret: process.env.REDIS_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 
 io.on("connection", (socket) => {
   const id = socket.id;
@@ -15,14 +35,16 @@ io.on("connection", (socket) => {
   console.log(`client ${id} connected`);
 
   socket.join(id);
-  socket.on("disconnect", () => console.log(`client ${id} disconnected @${socket.idUser}`));
+  socket.on("disconnect", () =>
+    console.log(`client ${id} disconnected`)
+  );
 });
 
 app.get("/isLoggedIn", async (req, res) => {
-  const isLoggedIn = !!req.user?.id
+  const isLoggedIn = !!req.user?.id;
 
-  return res.json({ isLoggedIn })
-})
+  return res.json({ isLoggedIn });
+});
 app.get("/auth/:idSocket", async (req, res) => {
   const { idSocket } = req.params;
 
