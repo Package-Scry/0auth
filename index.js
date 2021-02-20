@@ -88,6 +88,7 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
     redisClient.get(id, (error, reply) => {
       if (!reply)
         redisClient.set(id, JSON.stringify(user), (error) => {
+          console.log("SETTING")
           if (error) {
             console.log("redis error");
             console.error(error);
@@ -102,6 +103,7 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
       if (!req.session) req.session = {};
 
       req.session.token = token;
+      req.session.test = "test";
       io.to(idSocket).emit("authentication", "success");
     });
 
