@@ -53,12 +53,12 @@ app.get("/test", async (req, res) => {
   return res.json({ isLoggedIn: false });
 });
 app.get("/keys", async (req, res) => {
-  client.keys("*", async (err, keys) => {
+  redisClient.keys("*", async (err, keys) => {
     if (err) return console.log(err);
     if (keys) {
       await Promise.all(
         keys.map((key) => {
-          client.get(key, (error, value) => {
+          redisClient.get(key, (error, value) => {
             console.log(key, value);
           });
         })
