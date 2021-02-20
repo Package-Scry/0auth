@@ -39,10 +39,17 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => console.log(`client ${id} disconnected`));
 });
 
+app.get("/flush", async (req, res) => {
+  redisClient.flushdb(function (err, succeeded) {
+    return res.json({ flushed: succeeded });
+  });
+
+  return res.json({ flushed: false });
+});
 app.get("/isLoggedIn", async (req, res) => {
   req.session.test2 = "test2";
-    console.log("222222SAVED SESSSION")
-    console.log(req.session);
+  console.log("222222SAVED SESSSION");
+  console.log(req.session);
 
   return res.json({ isLoggedIn: false });
 });
