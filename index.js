@@ -25,6 +25,7 @@ app.use(
     store: new RedisStore({ client: redisClient }),
     secret: process.env.REDIS_SECRET,
     resave: false,
+    name: 'teest',
     saveUninitialized: false,
     cookie: { maxAge: 7 * 24 * 60 * 60000 }
   })
@@ -106,6 +107,11 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
 
       req.session.token = token;
       req.session.test = "test";
+      req.session.save(() => {
+        console.log("SAVED SESSSION")
+        console.log(req.session);
+        
+      });
       io.to(idSocket).emit("authentication", "success");
     });
 
