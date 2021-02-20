@@ -41,8 +41,12 @@ io.on("connection", (socket) => {
 });
 
 app.get("/isLoggedIn", async (req, res) => {
-  console.log("SESSION")
-  console.log(req.session)
+  req.session.test2 = "test2";
+  req.session.save(() => {
+    console.log("222222SAVED SESSSION")
+    console.log(req.session);
+    
+  });
 
   return res.json({ isLoggedIn: false });
 });
