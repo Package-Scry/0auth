@@ -50,6 +50,12 @@ app.get("/isLoggedIn", async (req, res) => {
 
   return res.json({ isLoggedIn: false });
 });
+app.get("/test", async (req, res) => {
+    console.log("-----------SESSSION")
+    console.log(req.session);
+
+  return res.json({ isLoggedIn: false });
+});
 app.get("/auth/:idSocket", async (req, res) => {
   const { idSocket } = req.params;
 
