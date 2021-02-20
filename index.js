@@ -26,7 +26,7 @@ app.use(
     secret: process.env.REDIS_SECRET,
     name: 'teest',
     saveUninitialized: false,
-    cookie: { secure: true, maxAge: 7 * 24 * 60 * 60000 }
+    cookie: { secure: true, maxAge: 10 }
   })
 );
 
