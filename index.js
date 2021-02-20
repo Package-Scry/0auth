@@ -26,11 +26,7 @@ app.use(
     secret: process.env.REDIS_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: {
-      secure: false, // if true only transmit cookie over https
-      httpOnly: false, // if true prevent client side JS from reading the cookie 
-      maxAge: 1000 * 60 * 10 // session max age in miliseconds
-  }
+    cookie: { maxAge: 7 * 24 * 60 * 60000 }
   })
 );
 
@@ -44,9 +40,10 @@ io.on("connection", (socket) => {
 });
 
 app.get("/isLoggedIn", async (req, res) => {
-  const isLoggedIn = !!req.session?.id;
+  console.log("SESSION")
+  console.log(req.session)
 
-  return res.json({ isLoggedIn });
+  return res.json({ isLoggedIn: false });
 });
 app.get("/auth/:idSocket", async (req, res) => {
   const { idSocket } = req.params;
