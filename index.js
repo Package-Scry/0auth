@@ -46,6 +46,8 @@ app.get("/isLoggedIn", async (req, res) => {
 app.get("/auth/:idSocket", async (req, res) => {
   const { idSocket } = req.params;
 
+  console.log("SESSION ISSSS")
+  console.log(req.session)
   res.redirect(
     `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=https://package-scry.herokuapp.com${callbackPath}${idSocket}`
   );
