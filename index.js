@@ -47,15 +47,31 @@ app.get("/isLoggedIn", async (req, res) => {
   return res.json({ isLoggedIn: false });
 });
 app.get("/test", async (req, res) => {
-    console.log("-----------SESSSION")
-    console.log(req.session);
+  console.log("-----------SESSSION");
+  console.log(req.session);
+
+  return res.json({ isLoggedIn: false });
+});
+app.get("/keys", async (req, res) => {
+  client.keys("*", async (err, keys) => {
+    if (err) return console.log(err);
+    if (keys) {
+      await Promise.all(
+        keys.map((key) => {
+          client.get(key, (error, value) => {
+            console.log(key, value);
+          });
+        })
+      );
+    }
+  });
 
   return res.json({ isLoggedIn: false });
 });
 app.get("/saveToken/:token", async (req, res) => {
   req.session.token = req.params.token;
-    console.log("+++++++SAVED SESSSION")
-    console.log(req.session);
+  console.log("+++++++SAVED SESSSION");
+  console.log(req.session);
 
   return res.json({ isLoggedIn: false });
 });
