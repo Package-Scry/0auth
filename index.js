@@ -35,13 +35,11 @@ io.on("connection", (socket) => {
   console.log(`client ${id} connected`);
 
   socket.join(id);
-  socket.on("disconnect", () =>
-    console.log(`client ${id} disconnected`)
-  );
+  socket.on("disconnect", () => console.log(`client ${id} disconnected`));
 });
 
 app.get("/isLoggedIn", async (req, res) => {
-  const isLoggedIn = !!req.user?.id;
+  const isLoggedIn = !!req.session?.id;
 
   return res.json({ isLoggedIn });
 });
@@ -77,7 +75,33 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
       },
     });
 
-    io.to(idSocket).emit("authentication", "success");
+    const { id, login: name, email } = data;
+    const user = {
+      id,
+      name,
+      email,
+    };
+
+    console.log(user)
+    redisClient.get(id, (error, reply) => {
+      if (!reply)
+        redisClient.set(id, user, (error) => {
+          if (error) {
+            console.log("redis error");
+            console.error(error);
+            io.to(idSocket).emit("authentication", "failure");
+          } else {
+            io.to(idSocket).emit("authentication", "success");
+          }
+        });
+
+      console.log("SESSION")
+      console.log(req.session)
+      if (!req.session) req.session = {};
+
+      req.session.token = token;
+      io.to(idSocket).emit("authentication", "success");
+    });
 
     return res.send("<script>window.close()</script>");
   } catch (error) {
