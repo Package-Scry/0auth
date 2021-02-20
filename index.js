@@ -24,10 +24,9 @@ app.use(
   session({
     store: new RedisStore({ client: redisClient }),
     secret: process.env.REDIS_SECRET,
-    resave: true,
     name: 'teest',
     saveUninitialized: false,
-    cookie: { maxAge: 7 * 24 * 60 * 60000 }
+    cookie: { secure: false, maxAge: 7 * 24 * 60 * 60000 }
   })
 );
 
