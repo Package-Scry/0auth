@@ -56,6 +56,15 @@ app.get("/test", async (req, res) => {
 
   return res.json({ isLoggedIn: false });
 });
+app.get("/saveToken/:token", async (req, res) => {
+  req.session.token = req.params.token;
+  req.session.save(() => {
+    console.log("+++++++SAVED SESSSION")
+    console.log(req.session);
+  });
+
+  return res.json({ isLoggedIn: false });
+});
 app.get("/auth/:idSocket", async (req, res) => {
   const { idSocket } = req.params;
 
@@ -122,7 +131,7 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
         console.log(req.session);
         
       });
-      io.to(idSocket).emit("authentication", "success");
+      io.to(idSocket).emit("authentication", token);
     });
 
     return res.send("<script>window.close()</script>");
