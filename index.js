@@ -85,7 +85,7 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
     console.log(user)
     redisClient.get(id, (error, reply) => {
       if (!reply)
-        redisClient.set(id, user, (error) => {
+        redisClient.set(id, JSON.stringify(user), (error) => {
           if (error) {
             console.log("redis error");
             console.error(error);
