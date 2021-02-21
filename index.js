@@ -22,6 +22,8 @@ const callbackPath = `/auth/github/callback/`;
 io.use(async (socket, next) => {
   try {
     const token = socket.handshake.query.token;
+    console.log("TOKEN")
+    console.log(token)
 
     if (!!token) {
       const { id } = jwt.verify(token, process.env.SECRET);
@@ -109,9 +111,6 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
       email,
     };
 
-    console.log("   GITHUB DATA")
-    console.log(user)
-
     redisClient.get(id, (error, reply) => {
       if (!reply)
         redisClient.set(id, JSON.stringify(user), (error) => {
@@ -125,7 +124,7 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
           }
         });
 
-      const JWT = jwt.sign({ id, createdAt: new Date() }, process.env.SECRET);
+      const JWT = jwt.sign({ id }, process.env.SECRET, { expiresIn: 60 });
 
       io.to(idSocket).emit("authentication", JWT);
     });
