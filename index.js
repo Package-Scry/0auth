@@ -115,6 +115,9 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
       email,
     };
 
+    console.log("   GITHUB DATA")
+    console.log(user)
+
     redisClient.get(id, (error, reply) => {
       if (!reply)
         redisClient.set(id, JSON.stringify(user), (error) => {
