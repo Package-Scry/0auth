@@ -23,15 +23,9 @@ io.use(async (socket, next) => {
   try {
     const token = socket.handshake.query.token;
 
-    console.log("token")
-    console.log(token)
-    console.log(typeof token)
-    console.log((!!token))
     if (!!token) {
-      console.log("here")
-      const { id } = jwt.verify(token, "shhhhh");
+      const { id } = jwt.verify(token, process.env.SECRET);
       socket.idUser = id;
-      console.log("USER ID", id)
     }
     
     next();
@@ -131,7 +125,7 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
           }
         });
 
-      const JWT = jwt.sign({ id, createdAt: new Date() }, 'shhhhh');
+      const JWT = jwt.sign({ id, createdAt: new Date() }, process.env.SECRET);
 
       io.to(idSocket).emit("authentication", JWT);
     });
