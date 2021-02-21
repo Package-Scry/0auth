@@ -22,10 +22,8 @@ const callbackPath = `/auth/github/callback/`;
 io.use(async (socket, next) => {
   try {
     const token = socket.handshake.query.token;
-    console.log("TOKEN", token)
-    console.log("TOKEN", typeof token)
 
-    if (token) {
+    if (!!token) {
       const { id } = jwt.verify(token, "shhhhh");
       socket.idUser = id;
       console.log("USER ID", id)
