@@ -32,9 +32,9 @@ io.use(async (socket, next) => {
       const { id } = jwt.verify(token, "shhhhh");
       socket.idUser = id;
       console.log("USER ID", id)
-      next();
     }
-
+    
+    next();
   } catch (err) {
     console.log("IO ERROR")
     console.log(err)
