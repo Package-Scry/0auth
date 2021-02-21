@@ -1,8 +1,7 @@
 const express = require("express");
-const session = require("express-session");
 const axios = require("axios");
 const redis = require("redis");
-const RedisStore = require("connect-redis")(session);
+const jwt = require('jsonwebtoken');
 
 const app = express();
 
@@ -20,15 +19,15 @@ const redisClient = redis.createClient({
 
 const callbackPath = `/auth/github/callback/`;
 
-app.use(
-  session({
-    store: new RedisStore({ client: redisClient }),
-    secret: process.env.REDIS_SECRET,
-    name: 'teest',
-    saveUninitialized: false,
-    cookie: { secure: true, maxAge: 10 }
-  })
-);
+io.use(async (socket, next) => {
+  try {
+    const token = socket.handshake.query.token;
+    const { id } = jwt.verify(token, "shhhhh");
+    socket.idUser = id;
+    console.log("USER ID", id)
+    next();
+  } catch (err) {}
+});
 
 io.on("connection", (socket) => {
   const id = socket.id;
@@ -39,26 +38,6 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => console.log(`client ${id} disconnected`));
 });
 
-app.get("/flush", async (req, res) => {
-  redisClient.flushdb(function (err, succeeded) {
-    return res.json({ flushed: succeeded });
-  });
-
-  return res.json({ flushed: false });
-});
-app.get("/isLoggedIn", async (req, res) => {
-  req.session.test2 = "test2";
-  console.log("222222SAVED SESSSION");
-  console.log(req.session);
-
-  return res.json({ isLoggedIn: false });
-});
-app.get("/test", async (req, res) => {
-  console.log("-----------SESSSION");
-  console.log(req.session);
-
-  return res.json({ isLoggedIn: false });
-});
 app.get("/keys", async (req, res) => {
   redisClient.keys("*", async (err, keys) => {
     if (err) return console.log(err);
@@ -75,18 +54,19 @@ app.get("/keys", async (req, res) => {
 
   return res.json({ isLoggedIn: false });
 });
-app.get("/saveToken/:token", async (req, res) => {
-  req.session.token = req.params.token;
-  console.log("+++++++SAVED SESSSION");
-  console.log(req.session);
 
-  return res.json({ isLoggedIn: false });
+app.get("/flush", async (req, res) => {
+  redisClient.flushdb(function (err, succeeded) {
+    return res.json({ flushed: succeeded });
+  });
+
+  return res.json({ flushed: false });
 });
+
+
 app.get("/auth/:idSocket", async (req, res) => {
   const { idSocket } = req.params;
 
-  console.log("SESSION ISSSS")
-  console.log(req.session)
   res.redirect(
     `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=https://package-scry.herokuapp.com${callbackPath}${idSocket}`
   );
@@ -123,11 +103,10 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
       email,
     };
 
-    console.log(user)
     redisClient.get(id, (error, reply) => {
       if (!reply)
         redisClient.set(id, JSON.stringify(user), (error) => {
-          console.log("SETTING")
+          console.log("SETTING");
           if (error) {
             console.log("redis error");
             console.error(error);
@@ -137,16 +116,9 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
           }
         });
 
-      console.log("SESSION")
-      console.log(req.session)
-      if (!req.session) req.session = {};
+      const JWT = jwt.sign({ id, createdAt: new Date() }, 'shhhhh');
 
-      req.session.token = token;
-      req.session.test = "test";
-        console.log("SAVED SESSSION")
-        console.log(req.session);
-        
-      io.to(idSocket).emit("authentication", token);
+      io.to(idSocket).emit("authentication", JWT);
     });
 
     return res.send("<script>window.close()</script>");
