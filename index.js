@@ -23,7 +23,12 @@ io.use(async (socket, next) => {
   try {
     const token = socket.handshake.query.token;
 
+    console.log("token")
+    console.log(token)
+    console.log(typeof token)
+    console.log((!!token))
     if (!!token) {
+      console.log("here")
       const { id } = jwt.verify(token, "shhhhh");
       socket.idUser = id;
       console.log("USER ID", id)
