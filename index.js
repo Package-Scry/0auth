@@ -29,12 +29,12 @@ io.use(async (socket, next) => {
       const { id } = jwt.verify(token, process.env.SECRET);
       socket.idUser = id;
     }
-    
-    next();
   } catch (err) {
     console.log("IO ERROR")
     console.log(err)
   }
+    
+  next();
 });
 
 io.on("connection", (socket) => {
