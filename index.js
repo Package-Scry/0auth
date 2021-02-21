@@ -50,7 +50,7 @@ io.on("connection", (socket) => {
       if (reply) {
         const JWT = jwt.sign({ id }, process.env.SECRET, { expiresIn: 60 });
 
-        io.to(idSocket).emit("authentication", JWT);
+        io.to(socket.id).emit("authentication", JWT);
       }
     });
 
