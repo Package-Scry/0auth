@@ -41,8 +41,19 @@ io.on("connection", (socket) => {
   const id = socket.id;
 
   console.log(`client ${id} connected`);
-
   socket.join(id);
+
+  const idUser = socket.idUser;
+
+  if (idUser)
+    redisClient.get(idUser, (error, reply) => {
+      if (reply) {
+        const JWT = jwt.sign({ id }, process.env.SECRET, { expiresIn: 60 });
+
+        io.to(idSocket).emit("authentication", JWT);
+      }
+    });
+
   socket.on("disconnect", () => console.log(`client ${id} disconnected`));
 });
 
