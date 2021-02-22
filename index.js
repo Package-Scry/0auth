@@ -22,8 +22,6 @@ const callbackPath = `/auth/github/callback/`;
 io.use(async (socket, next) => {
   try {
     const token = socket.handshake.query.token;
-    console.log("TOKEN")
-    console.log(token)
 
     if (!!token) {
       const { id } = jwt.verify(token, process.env.SECRET);
@@ -74,14 +72,6 @@ app.get("/keys", async (req, res) => {
   return res.json({ isLoggedIn: false });
 });
 
-app.get("/flush", async (req, res) => {
-  redisClient.flushdb(function (err, succeeded) {
-    return res.json({ flushed: succeeded });
-  });
-
-  return res.json({ flushed: false });
-});
-
 
 app.get("/auth/:idSocket", async (req, res) => {
   const { idSocket } = req.params;
@@ -115,17 +105,12 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
       },
     });
 
-    const { id, login: name, email } = data;
-    const user = {
-      id,
-      name,
-      email,
-    };
+    const { id } = data;
+    const user = { id, createdAt: new Date() };
 
     redisClient.get(id, (error, reply) => {
       if (!reply)
         redisClient.set(id, JSON.stringify(user), (error) => {
-          console.log("SETTING");
           if (error) {
             console.log("redis error");
             console.error(error);
