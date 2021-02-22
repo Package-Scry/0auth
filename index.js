@@ -48,7 +48,7 @@ io.on("connection", (socket) => {
   if (idUser)
     redisClient.get(idUser, (error, reply) => {
       if (reply) {
-        const JWT = jwt.sign({ id }, process.env.SECRET, { expiresIn: 60 });
+        const JWT = jwt.sign({ id }, process.env.SECRET, { expiresIn: "7d" });
 
         io.to(socket.id).emit("authentication", JWT);
       }
@@ -135,7 +135,7 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
           }
         });
 
-      const JWT = jwt.sign({ id }, process.env.SECRET, { expiresIn: 60 });
+      const JWT = jwt.sign({ id }, process.env.SECRET, { expiresIn: "7d" });
 
       io.to(idSocket).emit("authentication", JWT);
     });
