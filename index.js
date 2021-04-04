@@ -49,6 +49,9 @@ const getCurrentUser = async (idGitHub) => {
 };
 
 const createNewUser = async (idGitHub, username) => {
+  const database = client.db("website");
+  const users = database.collection("users-permissions_user");
+
   const newUser = {
     idGitHub,
     createdAt: new Date(),
