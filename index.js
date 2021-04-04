@@ -92,7 +92,7 @@ io.on("connection", async (socket) => {
   const idUser = socket.idUser;
 
   if (idUser) {
-    const currentUser = await getCurrentUser({ id: idUser });
+    const currentUser = await getCurrentUser({ _id: idUser });
     const { hasPro } = currentUser
 
     if (hasPro) authenticateWithSocket(socket.id, idUser, hasPro);
