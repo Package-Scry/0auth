@@ -38,12 +38,12 @@ io.use(async (socket, next) => {
   next();
 });
 
-const getCurrentUser = async (idGitHub) => {
+const getCurrentUser = async (query) => {
   const database = client.db("website");
   const admins = database.collection("strapi_administrator");
   const users = database.collection("users-permissions_user");
-  const user = await users.findOne({ idGitHub });
-  const admin = await admins.findOne({ idGitHub });
+  const user = await users.findOne(query);
+  const admin = await admins.findOne(query);
 
   return user ?? admin;
 };
@@ -92,7 +92,7 @@ io.on("connection", async (socket) => {
   const idUser = socket.idUser;
 
   if (idUser) {
-    const currentUser = await getCurrentUser(idUser);
+    const currentUser = await getCurrentUser({ id: idUser });
     const { hasPro } = currentUser
 
     if (hasPro) authenticateWithSocket(socket.id, idUser, hasPro);
@@ -136,7 +136,7 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
 
     const { id: idGitHub, login: username } = data;
     const currentUser =
-      (await getCurrentUser(idGitHub)) ??
+      (await getCurrentUser({ idGitHub })) ??
       (await createNewUser(idGitHub, username));
 
     if (isFromApp) {
