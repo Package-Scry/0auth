@@ -1,7 +1,7 @@
 const express = require("express");
 const axios = require("axios");
-const redis = require("redis");
-const jwt = require('jsonwebtoken');
+const { MongoClient, ObjectId } = require("mongodb");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 
@@ -10,14 +10,17 @@ const io = require("socket.io")(server);
 
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
-
-const redisClient = redis.createClient({
-  host: process.env.REDIS_HOST,
-  port: process.env.REDIS_PORT,
-  password: process.env.REDIS_PASS,
-});
-
 const callbackPath = `/auth/github/callback/`;
+const uri = process.env.MONGO_URI;
+const client = new MongoClient(uri);
+
+(async () => {
+  try {
+    await client.connect();
+  } catch (error) {
+    console.log("DB connect error:", error);
+  }
+})();
 
 io.use(async (socket, next) => {
   try {
@@ -28,14 +31,55 @@ io.use(async (socket, next) => {
       socket.idUser = id;
     }
   } catch (err) {
-    console.log("IO ERROR")
-    console.log(err)
+    console.log("IO ERROR");
+    console.log(err);
   }
-    
+
   next();
 });
 
-io.on("connection", (socket) => {
+const getCurrentUser = async (idGitHub) => {
+  const database = client.db("website");
+  const admins = database.collection("strapi_administrator");
+  const users = database.collection("users-permissions_user");
+  const user = await users.findOne({ idGitHub });
+  const admin = await admins.findOne({ idGitHub });
+
+  return user ?? admin;
+};
+
+const createNewUser = async (idGitHub, username) => {
+  const newUser = {
+    idGitHub,
+    createdAt: new Date(),
+    hasPro: true,
+    lastPaidAt: new Date(),
+    // strapi fields
+    username,
+    password: "",
+    confirmed: true,
+    blocked: false,
+    provider: "local",
+    created_by: ObjectId("605b9add8e10cc7b4c37930a"),
+    role: ObjectId("605b9a5d8e10cc7b4c379234"),
+    updated_by: ObjectId("605b9add8e10cc7b4c37930a"),
+  };
+
+  try {
+    return await users.insertOne(newUser);
+  } catch (error) {
+    console.error("Mongo user insert error:", error);
+  }
+}
+
+const signJWT = (idUser) => jwt.sign({ id: idUser }, process.env.SECRET, { expiresIn: "7d" });
+const authenticateWithSocket = (idSocket, idUser, hasPro) => {
+  const JWT = signJWT(idUser)
+
+  io.to(idSocket).emit("authentication", { token: JWT, hasPro });
+};
+
+io.on("connection", async (socket) => {
   const id = socket.id;
 
   console.log(`client ${id} connected`);
@@ -43,35 +87,14 @@ io.on("connection", (socket) => {
 
   const idUser = socket.idUser;
 
-  if (idUser)
-    redisClient.get(idUser, (error, reply) => {
-      if (reply) {
-        const JWT = jwt.sign({ id }, process.env.SECRET, { expiresIn: "7d" });
+  if (idUser) {
+    const currentUser = await getCurrentUser(idUser);
 
-        io.to(socket.id).emit("authentication", JWT);
-      }
-    });
+    if (hasPro) authenticateWithSocket(socket.id, idUser, currentUser.hasPro);
+  }
 
   socket.on("disconnect", () => console.log(`client ${id} disconnected`));
 });
-
-app.get("/keys", async (req, res) => {
-  redisClient.keys("*", async (err, keys) => {
-    if (err) return console.log(err);
-    if (keys) {
-      await Promise.all(
-        keys.map((key) => {
-          redisClient.get(key, (error, value) => {
-            console.log(key, value);
-          });
-        })
-      );
-    }
-  });
-
-  return res.json({ isLoggedIn: false });
-});
-
 
 app.get("/auth/:idSocket", async (req, res) => {
   const { idSocket } = req.params;
@@ -89,6 +112,7 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
     code: req.query.code,
   };
   const options = { headers: { accept: "application/json" } };
+  const isFromApp = idSocket !== "000000";
 
   try {
     const response = await axios.post(
@@ -105,27 +129,18 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
       },
     });
 
-    const { id } = data;
-    const user = { id, createdAt: new Date() };
+    const { id: idGitHub, login: username } = data;
+    const currentUser = await getCurrentUser(idGitHub) ?? await createNewUser(idGitHub, username);
 
-    redisClient.get(id, (error, reply) => {
-      if (!reply)
-        redisClient.set(id, JSON.stringify(user), (error) => {
-          if (error) {
-            console.log("redis error");
-            console.error(error);
-            io.to(idSocket).emit("authentication", "failure");
-          } else {
-            io.to(idSocket).emit("authentication", "success");
-          }
-        });
+    if (isFromApp) {
+      authenticateWithSocket(idSocket, id, currentUser.hasPro);
+      return res.send("<script>window.close()</script>");
+    } else {
+      const JWT = signJWT(idUser)
 
-      const JWT = jwt.sign({ id }, process.env.SECRET, { expiresIn: "7d" });
-
-      io.to(idSocket).emit("authentication", JWT);
-    });
-
-    return res.send("<script>window.close()</script>");
+      res.set("x-token", JWT);
+      res.redirect("https://packagescry.com/success");
+    }
   } catch (error) {
     console.error(error);
   }
