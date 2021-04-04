@@ -139,7 +139,7 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
       (await createNewUser(idGitHub, username));
 
     if (isFromApp) {
-      authenticateWithSocket(idSocket, id, currentUser.hasPro);
+      authenticateWithSocket(idSocket, currentUser._id, currentUser.hasPro);
       return res.send("<script>window.close()</script>");
     } else {
       const JWT = signJWT(idUser);
