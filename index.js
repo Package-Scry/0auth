@@ -12,7 +12,7 @@ const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
 const callbackPath = `/auth/github/callback/`;
 const uri = process.env.MONGO_URI;
-const client = new MongoClient(uri);
+const client = new MongoClient(uri, { useUnifiedTopology: true });
 
 (async () => {
   try {
@@ -70,11 +70,12 @@ const createNewUser = async (idGitHub, username) => {
   } catch (error) {
     console.error("Mongo user insert error:", error);
   }
-}
+};
 
-const signJWT = (idUser) => jwt.sign({ id: idUser }, process.env.SECRET, { expiresIn: "7d" });
+const signJWT = (idUser) =>
+  jwt.sign({ id: idUser }, process.env.SECRET, { expiresIn: "7d" });
 const authenticateWithSocket = (idSocket, idUser, hasPro) => {
-  const JWT = signJWT(idUser)
+  const JWT = signJWT(idUser);
 
   io.to(idSocket).emit("authentication", { token: JWT, hasPro });
 };
@@ -130,13 +131,15 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
     });
 
     const { id: idGitHub, login: username } = data;
-    const currentUser = await getCurrentUser(idGitHub) ?? await createNewUser(idGitHub, username);
+    const currentUser =
+      (await getCurrentUser(idGitHub)) ??
+      (await createNewUser(idGitHub, username));
 
     if (isFromApp) {
       authenticateWithSocket(idSocket, id, currentUser.hasPro);
       return res.send("<script>window.close()</script>");
     } else {
-      const JWT = signJWT(idUser)
+      const JWT = signJWT(idUser);
 
       res.set("x-token", JWT);
       res.redirect("https://packagescry.com/success");
