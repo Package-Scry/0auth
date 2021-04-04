@@ -39,14 +39,11 @@ io.use(async (socket, next) => {
 });
 
 const getCurrentUser = async (query) => {
-  console.log(query)
   const database = client.db("website");
   const admins = database.collection("strapi_administrator");
   const users = database.collection("users-permissions_user");
   const user = await users.findOne(query);
   const admin = await admins.findOne(query);
-  console.log(admin)
-  console.log(user)
 
   return user ?? admin;
 };
