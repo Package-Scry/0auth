@@ -95,7 +95,8 @@ io.on("connection", async (socket) => {
     const currentUser = await getCurrentUser({ _id: ObjectId(idUser) });
     const { hasPro } = currentUser
 
-    if (hasPro) authenticateWithSocket(socket.id, idUser, hasPro);
+    if (hasPro) authenticateWithSocket(socket.id, idUser, hasPro)
+    else io.to(idSocket).emit("authentication", { token: null, hasPro })
   }
 
   socket.on("disconnect", () => console.log(`client ${id} disconnected`));
