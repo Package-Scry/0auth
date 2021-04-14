@@ -141,7 +141,7 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
 
     if (isFromApp) {
       authenticateWithSocket(idSocket, currentUser._id, currentUser.hasPro);
-      return res.send("<script>window.close()</script>");
+      return res.send("window.location.href='package-scry://'");
     } else {
       const JWT = signJWT(idUser);
 
