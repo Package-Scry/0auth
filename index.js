@@ -69,7 +69,9 @@ const createNewUser = async (idGitHub, username) => {
   };
 
   try {
-    return await users.insertOne(newUser);
+    const { insertedId } = await users.insertOne(newUser);
+    
+    return await getCurrentUser({ _id: insertedId })
   } catch (error) {
     console.error("Mongo user insert error:", error);
   }
