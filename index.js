@@ -145,6 +145,7 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
       authenticateWithSocket(idSocket, currentUser._id, currentUser.hasPro);
       return res.send(redirectHtml);
     } else {
+      const { idUser } = currentUser
       const JWT = signJWT(idUser);
 
       res.set("x-token", JWT);
