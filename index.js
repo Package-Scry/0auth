@@ -149,7 +149,7 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
       const JWT = signJWT(idUser);
 
       res.set("x-token", JWT);
-      res.redirect("https://packagescry.com/success");
+      res.redirect("https://packagescry.com");
     }
   } catch (error) {
     console.error(error);
