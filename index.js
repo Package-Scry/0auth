@@ -149,10 +149,29 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
       const JWT = signJWT(idUser);
 
       res.set("x-token", JWT);
-      res.redirect("https://packagescry.com");
+      res.redirect("https://packagescry.com/login-success");
     }
   } catch (error) {
     console.error(error);
+  }
+});
+
+app.get("/site/auth", async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.split(' ')[1];
+
+  try {
+    if (!!token) {
+      const { id } = jwt.verify(token, process.env.SECRET);
+      const currentUser = await getCurrentUser({ id })
+
+      if (currentUser) res.json({ status: "success", id });
+      else res.json({ status: "failed" });
+    }
+  } catch (err) {
+    console.log("IO ERROR");
+    console.log(err);
+    res.json({ status: "failed" });
   }
 });
 
