@@ -14,6 +14,7 @@ const clientSecret = process.env.CLIENT_SECRET;
 const callbackPath = `/auth/github/callback/`;
 const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri, { useUnifiedTopology: true });
+const CORS_ORIGIN = ["https://www.packagescry.com", "https://www.github.com"]
 
 (async () => {
   try {
@@ -106,7 +107,7 @@ io.on("connection", async (socket) => {
 
 app.get(
   "/auth/:idSocket",
-  cors({ origin: "https://www.packagescry.com" }),
+  cors({ origin: CORS_ORIGIN }),
   async (req, res) => {
     const { idSocket } = req.params;
 
@@ -154,7 +155,7 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
       const JWT = signJWT(idUser);
 
       res.set("x-token", JWT);
-      res.json({ status: "success" });
+      res.redirect("https://packagescry.com/login-success");
     }
   } catch (error) {
     console.error(error);
@@ -163,7 +164,7 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
 
 app.get(
   "/site/auth",
-  cors({ origin: "https://www.packagescry.com" }),
+  cors({ origin: CORS_ORIGIN }),
   async (req, res) => {
     const authHeader = req.headers.authorization;
     const token = authHeader?.split(" ")[1];
