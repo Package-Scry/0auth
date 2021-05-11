@@ -2,7 +2,7 @@ const express = require("express");
 const axios = require("axios");
 const { MongoClient, ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
-const cors = require('cors')
+const cors = require("cors");
 
 const app = express();
 
@@ -14,7 +14,7 @@ const clientSecret = process.env.CLIENT_SECRET;
 const callbackPath = `/auth/github/callback/`;
 const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri, { useUnifiedTopology: true });
-const CORS_ORIGIN = ["https://www.packagescry.com", "https://www.github.com"]
+const CORS_ORIGIN = ["https://www.packagescry.com", "https://www.github.com"];
 
 (async () => {
   try {
@@ -72,8 +72,8 @@ const createNewUser = async (idGitHub, username) => {
 
   try {
     const { insertedId } = await users.insertOne(newUser);
-    
-    return await getCurrentUser({ _id: insertedId })
+
+    return await getCurrentUser({ _id: insertedId });
   } catch (error) {
     console.error("Mongo user insert error:", error);
   }
@@ -97,25 +97,21 @@ io.on("connection", async (socket) => {
 
   if (idUser) {
     const currentUser = await getCurrentUser({ _id: ObjectId(idUser) });
-    const { hasPro } = currentUser
+    const { hasPro } = currentUser;
 
-    authenticateWithSocket(socket.id, idUser, hasPro)
+    authenticateWithSocket(socket.id, idUser, hasPro);
   }
 
   socket.on("disconnect", () => console.log(`client ${id} disconnected`));
 });
 
-app.get(
-  "/auth/:idSocket",
-  cors({ origin: CORS_ORIGIN }),
-  async (req, res) => {
-    const { idSocket } = req.params;
+app.get("/auth/:idSocket", cors({ origin: CORS_ORIGIN }), async (req, res) => {
+  const { idSocket } = req.params;
 
-    res.redirect(
-      `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=https://package-scry.herokuapp.com${callbackPath}${idSocket}`
-    );
-  }
-);
+  res.redirect(
+    `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=https://package-scry.herokuapp.com${callbackPath}${idSocket}`
+  );
+});
 
 app.get(`${callbackPath}:idSocket`, async (req, res) => {
   const { idSocket } = req.params;
@@ -151,7 +147,7 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
       authenticateWithSocket(idSocket, currentUser._id, currentUser.hasPro);
       return res.send(redirectHtml);
     } else {
-      const { idUser } = currentUser
+      const { idUser } = currentUser;
       const JWT = signJWT(idUser);
 
       res.set("x-token", JWT);
@@ -162,30 +158,26 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
   }
 });
 
-app.get(
-  "/site/auth",
-  cors({ origin: CORS_ORIGIN }),
-  async (req, res) => {
-    const authHeader = req.headers.authorization;
-    const token = authHeader?.split(" ")[1];
+app.get("/site/auth", cors({ origin: CORS_ORIGIN }), async (req, res) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.split(" ")[1];
 
-    try {
-      if (!!token) {
-        const { id } = jwt.verify(token, process.env.SECRET);
-        const currentUser = await getCurrentUser({ id });
+  try {
+    if (!!token) {
+      const { id } = jwt.verify(token, process.env.SECRET);
+      const currentUser = await getCurrentUser({ id });
 
-        if (currentUser) res.json({ status: "success", id });
-        else res.json({ status: "failed" });
-      }
-    } catch (err) {
-      console.log("IO ERROR");
-      console.log(err);
-      res.json({ status: "failed" });
+      if (currentUser) res.json({ status: "success", id });
+      else res.json({ status: "failed" });
     }
+  } catch (err) {
+    console.log("IO ERROR");
+    console.log(err);
+    res.json({ status: "failed" });
   }
-);
+});
 
 const port = process.env.PORT || 3000;
 server.listen(port, () => console.log("App listening on port " + port));
 
-const redirectHtml = `<script>window.addEventListener('DOMContentLoaded', () => {window.location.href='package-scry://'})</script><body><style type="text/css">body {background: linear-gradient(179.15deg, #0D262A 0.73%, #143F4A 22.09%, rgba(31, 125, 131, 0.873478) 50.87%, #1D787E 60.42%), #041D22;color: white;margin: 0;width: 100%;height: 100%;font-size: 3em;font-family: Bitter;box-sizing: border-box;}</style><div style="margin: 4em 0;text-align: center;">Login successful</div></body>`
+const redirectHtml = `<script>window.addEventListener('DOMContentLoaded', () => {window.location.href='package-scry://'})</script><body><style type="text/css">body {background: linear-gradient(179.15deg, #0D262A 0.73%, #143F4A 22.09%, rgba(31, 125, 131, 0.873478) 50.87%, #1D787E 60.42%), #041D22;color: white;margin: 0;width: 100%;height: 100%;font-size: 3em;font-family: Bitter;box-sizing: border-box;}</style><div style="margin: 4em 0;text-align: center;">Login successful</div></body>`;
