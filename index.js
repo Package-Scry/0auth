@@ -14,7 +14,7 @@ const clientSecret = process.env.CLIENT_SECRET;
 const callbackPath = `/auth/github/callback/`;
 const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri, { useUnifiedTopology: true });
-const CORS_ORIGIN = ["https://www.packagescry.com", "https://www.github.com"];
+const CORS_ORIGIN = ["https://www.packagescry.com", "https://github.com"];
 
 (async () => {
   try {
