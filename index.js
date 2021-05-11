@@ -105,7 +105,7 @@ io.on("connection", async (socket) => {
   socket.on("disconnect", () => console.log(`client ${id} disconnected`));
 });
 
-app.get("/auth/:idSocket", cors({ origin: CORS_ORIGIN }), async (req, res) => {
+app.get("/auth/:idSocket", cors(), async (req, res) => {
   const { idSocket } = req.params;
 
   res.redirect(
@@ -158,7 +158,7 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
   }
 });
 
-app.get("/site/auth", cors({ origin: CORS_ORIGIN }), async (req, res) => {
+app.get("/site/auth", cors(), async (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader?.split(" ")[1];
 
