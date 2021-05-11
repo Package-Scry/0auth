@@ -2,6 +2,7 @@ const express = require("express");
 const axios = require("axios");
 const { MongoClient, ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
+const cors = require('cors')
 
 const app = express();
 
@@ -103,13 +104,17 @@ io.on("connection", async (socket) => {
   socket.on("disconnect", () => console.log(`client ${id} disconnected`));
 });
 
-app.get("/auth/:idSocket", async (req, res) => {
-  const { idSocket } = req.params;
+app.get(
+  "/auth/:idSocket",
+  cors({ origin: "https://www.packagescry.com" }),
+  async (req, res) => {
+    const { idSocket } = req.params;
 
-  res.redirect(
-    `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=https://package-scry.herokuapp.com${callbackPath}${idSocket}`
-  );
-});
+    res.redirect(
+      `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=https://package-scry.herokuapp.com${callbackPath}${idSocket}`
+    );
+  }
+);
 
 app.get(`${callbackPath}:idSocket`, async (req, res) => {
   const { idSocket } = req.params;
@@ -156,24 +161,28 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
   }
 });
 
-app.get("/site/auth", async (req, res) => {
-  const authHeader = req.headers.authorization;
-  const token = authHeader?.split(' ')[1];
+app.get(
+  "/site/auth",
+  cors({ origin: "https://www.packagescry.com" }),
+  async (req, res) => {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.split(" ")[1];
 
-  try {
-    if (!!token) {
-      const { id } = jwt.verify(token, process.env.SECRET);
-      const currentUser = await getCurrentUser({ id })
+    try {
+      if (!!token) {
+        const { id } = jwt.verify(token, process.env.SECRET);
+        const currentUser = await getCurrentUser({ id });
 
-      if (currentUser) res.json({ status: "success", id });
-      else res.json({ status: "failed" });
+        if (currentUser) res.json({ status: "success", id });
+        else res.json({ status: "failed" });
+      }
+    } catch (err) {
+      console.log("IO ERROR");
+      console.log(err);
+      res.json({ status: "failed" });
     }
-  } catch (err) {
-    console.log("IO ERROR");
-    console.log(err);
-    res.json({ status: "failed" });
   }
-});
+);
 
 const port = process.env.PORT || 3000;
 server.listen(port, () => console.log("App listening on port " + port));
