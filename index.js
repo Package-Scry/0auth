@@ -113,7 +113,7 @@ app.get("/auth/:idSocket", cors(), async (req, res) => {
   );
 });
 
-app.get(`${callbackPath}:idSocket`, async (req, res) => {
+app.get(`${callbackPath}:idSocket`, cors(), async (req, res) => {
   const { idSocket } = req.params;
   const body = {
     client_id: clientId,
