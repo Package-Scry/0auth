@@ -16,6 +16,8 @@ const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri, { useUnifiedTopology: true });
 const CORS_ORIGIN = ["https://www.packagescry.com", "https://github.com"];
 
+app.use(cors())
+
 (async () => {
   try {
     await client.connect();
@@ -105,7 +107,7 @@ io.on("connection", async (socket) => {
   socket.on("disconnect", () => console.log(`client ${id} disconnected`));
 });
 
-app.get("/auth/:idSocket", cors(), async (req, res) => {
+app.get("/auth/:idSocket", async (req, res) => {
   const { idSocket } = req.params;
 
   res.redirect(
@@ -113,7 +115,7 @@ app.get("/auth/:idSocket", cors(), async (req, res) => {
   );
 });
 
-app.get(`${callbackPath}:idSocket`, cors(), async (req, res) => {
+app.get(`${callbackPath}:idSocket`, async (req, res) => {
   const { idSocket } = req.params;
   const body = {
     client_id: clientId,
@@ -159,7 +161,7 @@ app.get(`${callbackPath}:idSocket`, cors(), async (req, res) => {
   }
 });
 
-app.get("/site/auth", cors(), async (req, res) => {
+app.get("/site/auth", async (req, res) => {
   const authHeader = req.headers.authorization;
   const token = authHeader?.split(" ")[1];
 
