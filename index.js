@@ -107,12 +107,17 @@ io.on("connection", async (socket) => {
   socket.on("disconnect", () => console.log(`client ${id} disconnected`));
 });
 
+const getRedirectUrl = (idSocket) =>
+  `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=https://package-scry.herokuapp.com${callbackPath}${idSocket}`;
+
 app.get("/auth/:idSocket", async (req, res) => {
   const { idSocket } = req.params;
 
-  res.redirect(
-    `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=https://package-scry.herokuapp.com${callbackPath}${idSocket}`
-  );
+  res.redirect(getRedirectUrl(idSocket));
+});
+
+app.get("/site/auth", async (req, res) => {
+  res.json({ url: getRedirectUrl("000000") });
 });
 
 app.get(`${callbackPath}:idSocket`, async (req, res) => {
@@ -153,7 +158,7 @@ app.get(`${callbackPath}:idSocket`, async (req, res) => {
       const JWT = signJWT(idUser);
 
       res.set("x-token", JWT);
-      console.log(JSON.stringify(res, null, 2))
+      console.log(JSON.stringify(res, null, 2));
       res.redirect("https://packagescry.com/login-success");
     }
   } catch (error) {
