@@ -194,7 +194,7 @@ app.get(`${CALLBACK_PATH}:idSocket`, async (req, res) => {
 });
 
 app.get("/site/redirect", async (req, res) => {
-  res.redirect(getRedirectUrl("000000"));
+  res.json({ oauthUrl: getRedirectUrl("000000") });
 });
 
 app.get("/test/redirect", async (req, res) => {
