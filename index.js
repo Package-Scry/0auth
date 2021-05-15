@@ -25,7 +25,9 @@ app.use(
     secret: CLIENT_SECRET,
     saveUninitialized: false,
     resave: false,
-    sameSite: "none",
+    cookie: {
+      sameSite: "none",
+    },
     store: MongoStore.create({
       mongoUrl: URI,
       ttl: 14 * 24 * 60 * 60,
