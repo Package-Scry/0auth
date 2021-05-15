@@ -26,6 +26,7 @@ app.use(
     saveUninitialized: false,
     resave: false,
     cookie: {
+      domain: "https://www.packagescry.com",
       maxAge: 14 * 24 * 60 * 60,
     },
     store: MongoStore.create({
