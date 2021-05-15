@@ -26,7 +26,7 @@ app.use(
     saveUninitialized: false,
     resave: false,
     cookie: {
-      sameSite: "strict",
+      sameSite: "lax",
       secure: true,
       maxAge: 14 * 24 * 60 * 60,
     },
