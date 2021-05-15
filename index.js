@@ -161,7 +161,7 @@ app.get("/auth/:idSocket", async (req, res) => {
   res.redirect(getRedirectUrl(idSocket));
 });
 
-app.get(`${CALLBACK_PATH}/000000*`, async (req, res) => {
+app.get(`${CALLBACK_PATH}/000000/*`, async (req, res) => {
   const { idGitHub, username } = await getGitHubData(req.query.code);
   const currentUser =
     (await getCurrentUser({ idGitHub })) ??
