@@ -25,6 +25,7 @@ app.use(
     secret: CLIENT_SECRET,
     saveUninitialized: false,
     resave: false,
+    sameSite: "none",
     store: MongoStore.create({
       mongoUrl: URI,
       ttl: 14 * 24 * 60 * 60,
@@ -204,7 +205,7 @@ app.get("/test/redirect", async (req, res) => {
 app.get("/site/check", async (req, res) => {
   const user = req.session?.user;
 
-  console.log(user)
+  console.log(user);
 
   res.json({ status: "success", user });
 });
