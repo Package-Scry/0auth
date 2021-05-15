@@ -198,6 +198,9 @@ app.get("/site/redirect", async (req, res) => {
 });
 app.get("/site/check", async (req, res) => {
   const user = req.session?.user;
+
+  console.log(user)
+
   res.json({ status: "success", user });
 });
 
