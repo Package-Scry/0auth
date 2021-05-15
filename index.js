@@ -27,6 +27,8 @@ app.use(
     resave: false,
     cookie: {
       sameSite: "none",
+      secure: true,
+      maxAge: 14 * 24 * 60 * 60,
     },
     store: MongoStore.create({
       mongoUrl: URI,
