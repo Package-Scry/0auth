@@ -198,7 +198,7 @@ app.get("/site/redirect", async (req, res) => {
 });
 
 app.get("/test/redirect", async (req, res) => {
-  res.redirect("http://localhost:3000");
+  res.redirect("https://ps-strapi.herokuapp.com/");
 });
 
 app.get("/site/check", async (req, res) => {
