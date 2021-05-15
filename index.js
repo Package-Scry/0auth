@@ -1,6 +1,8 @@
 const express = require("express");
 const axios = require("axios");
 const { MongoClient, ObjectId } = require("mongodb");
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 
@@ -9,14 +11,27 @@ const app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 
-const clientId = process.env.CLIENT_ID;
-const clientSecret = process.env.CLIENT_SECRET;
-const callbackPath = `/auth/github/callback/`;
-const uri = process.env.MONGO_URI;
-const client = new MongoClient(uri, { useUnifiedTopology: true });
+const ID_CLIENT = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const APP_BASE_URL = "https://package-scry.herokuapp.com";
+const CALLBACK_PATH = `/auth/github/callback/`;
+const URI = process.env.MONGO_URI;
 const CORS_ORIGIN = ["https://www.packagescry.com", "https://github.com"];
+const client = new MongoClient(URI, { useUnifiedTopology: true });
 
 app.use(cors({ origin: true, credentials: true }));
+app.use(
+  session({
+    secret: CLIENT_SECRET,
+    saveUninitialized: false,
+    resave: false,
+    store: MongoStore.create({
+      mongoUrl: URI,
+      ttl: 14 * 24 * 60 * 60,
+      touchAfter: 24 * 60 * 60,
+    }),
+  })
+);
 
 (async () => {
   try {
@@ -81,6 +96,39 @@ const createNewUser = async (idGitHub, username) => {
   }
 };
 
+const getRedirectUrl = (idSocket) =>
+  `https://github.com/login/oauth/authorize?client_id=${ID_CLIENT}&redirect_uri=${APP_BASE_URL}${CALLBACK_PATH}${idSocket}`;
+
+const getGitHubData = async (code) => {
+  const body = {
+    client_id: ID_CLIENT,
+    client_secret: CLIENT_SECRET,
+    code,
+  };
+  const options = { headers: { accept: "application/json" } };
+
+  try {
+    const response = await axios.post(
+      `https://github.com/login/oauth/access_token`,
+      body,
+      options
+    );
+    const token = response.data.access_token;
+    const { data } = await axios({
+      method: "get",
+      url: `https://api.github.com/user`,
+      headers: {
+        Authorization: "token " + token,
+      },
+    });
+    const { id: idGitHub, login: username } = data;
+
+    return { idGitHub, username };
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const signJWT = (idUser) =>
   jwt.sign({ id: idUser }, process.env.SECRET, { expiresIn: "7d" });
 const authenticateWithSocket = (idSocket, idUser, hasPro) => {
@@ -107,85 +155,54 @@ io.on("connection", async (socket) => {
   socket.on("disconnect", () => console.log(`client ${id} disconnected`));
 });
 
-const getRedirectUrl = (idSocket) =>
-  `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=https://package-scry.herokuapp.com${callbackPath}${idSocket}`;
-
 app.get("/auth/:idSocket", async (req, res) => {
   const { idSocket } = req.params;
 
   res.redirect(getRedirectUrl(idSocket));
 });
 
-app.get("/site/auth", async (req, res) => {
-  res.json({ url: getRedirectUrl("000000") });
+app.get(`${CALLBACK_PATH}/000000`, async (req, res) => {
+  const { idGitHub, username } = await getGitHubData(req.query.code);
+  const currentUser =
+    (await getCurrentUser({ idGitHub })) ??
+    (await createNewUser(idGitHub, username));
+
+  if (!req.session) req.session = {};
+
+  req.session.user = {
+    id: currentUser._id,
+  };
+
+  return res.redirect("https://packagescry.com/login-success");
 });
 
-app.get(`${callbackPath}:idSocket`, async (req, res) => {
+app.get(`${CALLBACK_PATH}:idSocket`, async (req, res) => {
   const { idSocket } = req.params;
-  const body = {
-    client_id: clientId,
-    client_secret: clientSecret,
-    code: req.query.code,
-  };
-  const options = { headers: { accept: "application/json" } };
-  const isFromApp = idSocket !== "000000";
 
   try {
-    const response = await axios.post(
-      `https://github.com/login/oauth/access_token`,
-      body,
-      options
-    );
-    const token = response.data.access_token;
-    const { data } = await axios({
-      method: "get",
-      url: `https://api.github.com/user`,
-      headers: {
-        Authorization: "token " + token,
-      },
-    });
-
-    const { id: idGitHub, login: username } = data;
+    const { idGitHub, username } = await getGitHubData(req.query.code);
     const currentUser =
       (await getCurrentUser({ idGitHub })) ??
       (await createNewUser(idGitHub, username));
 
-    if (isFromApp) {
-      authenticateWithSocket(idSocket, currentUser._id, currentUser.hasPro);
-      return res.send(redirectHtml);
-    } else {
-      const { idUser } = currentUser;
-      const JWT = signJWT(idUser);
+    authenticateWithSocket(idSocket, currentUser._id, currentUser.hasPro);
 
-      res.set("x-token", JWT);
-      console.log(JSON.stringify(res, null, 2));
-      res.redirect("https://packagescry.com/login-success");
-    }
+    return res.send(redirectHtml);
   } catch (error) {
     console.error(error);
   }
 });
 
-app.get("/site/auth", async (req, res) => {
-  const authHeader = req.headers.authorization;
-  const token = authHeader?.split(" ")[1];
-
-  try {
-    if (!!token) {
-      const { id } = jwt.verify(token, process.env.SECRET);
-      const currentUser = await getCurrentUser({ id });
-
-      if (currentUser) res.json({ status: "success", id });
-      else res.json({ status: "failed" });
-    }
-  } catch (err) {
-    console.log("IO ERROR");
-    console.log(err);
-    res.json({ status: "failed" });
-  }
+app.get("/site/redirect", async (req, res) => {
+  res.json({ url: getRedirectUrl("000000") });
+});
+app.get("/site/check", async (req, res) => {
+  const user = req.session?.user;
+  res.json({ status: "success", user });
 });
 
 const port = process.env.PORT || 3000;
+
 server.listen(port, () => console.log("App listening on port " + port));
 
 const redirectHtml = `<script>window.addEventListener('DOMContentLoaded', () => {window.location.href='package-scry://'})</script><body><style type="text/css">body {background: linear-gradient(179.15deg, #0D262A 0.73%, #143F4A 22.09%, rgba(31, 125, 131, 0.873478) 50.87%, #1D787E 60.42%), #041D22;color: white;margin: 0;width: 100%;height: 100%;font-size: 3em;font-family: Bitter;box-sizing: border-box;}</style><div style="margin: 4em 0;text-align: center;">Login successful</div></body>`;
