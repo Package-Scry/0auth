@@ -26,6 +26,7 @@ app.use(
     saveUninitialized: false,
     resave: false,
     cookie: {
+      sameSite: "none",
       domain: "https://www.packagescry.com",
       maxAge: 14 * 24 * 60 * 60,
     },
