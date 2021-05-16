@@ -19,6 +19,7 @@ const URI = process.env.MONGO_URI;
 const CORS_ORIGIN = ["https://www.packagescry.com", "https://github.com"];
 const client = new MongoClient(URI, { useUnifiedTopology: true });
 
+app.enable('trust proxy')
 app.use(cors({ origin: true, credentials: true }));
 app.use(
   session({
