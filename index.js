@@ -19,8 +19,7 @@ const URI = process.env.MONGO_URI;
 const CORS_ORIGIN = ["https://www.packagescry.com", "https://github.com"];
 const client = new MongoClient(URI, { useUnifiedTopology: true });
 
-app.enable('trust proxy')
-app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
+app.enable("trust proxy");
 app.use(
   session({
     secret: CLIENT_SECRET,
@@ -29,7 +28,7 @@ app.use(
     cookie: {
       sameSite: "none",
       maxAge: 14 * 24 * 60 * 60,
-      secure: true
+      secure: true,
     },
     store: MongoStore.create({
       mongoUrl: URI,
@@ -167,20 +166,24 @@ app.get("/auth/:idSocket", async (req, res) => {
   res.redirect(getRedirectUrl(idSocket));
 });
 
-app.get(`${CALLBACK_PATH}000000*`, async (req, res) => {
-  const { idGitHub, username } = await getGitHubData(req.query.code);
-  const currentUser =
-    (await getCurrentUser({ idGitHub })) ??
-    (await createNewUser(idGitHub, username));
+app.get(
+  `${CALLBACK_PATH}000000*`,
+  cors({ origin: CORS_ORIGIN, credentials: true }),
+  async (req, res) => {
+    const { idGitHub, username } = await getGitHubData(req.query.code);
+    const currentUser =
+      (await getCurrentUser({ idGitHub })) ??
+      (await createNewUser(idGitHub, username));
 
-  if (!req.session) req.session = {};
+    if (!req.session) req.session = {};
 
-  req.session.user = {
-    id: currentUser._id,
-  };
+    req.session.user = {
+      id: currentUser._id,
+    };
 
-  return res.redirect("https://packagescry.com/login-success");
-});
+    return res.redirect("https://packagescry.com/login-success");
+  }
+);
 
 app.get(`${CALLBACK_PATH}:idSocket`, async (req, res) => {
   const { idSocket } = req.params;
@@ -199,21 +202,13 @@ app.get(`${CALLBACK_PATH}:idSocket`, async (req, res) => {
   }
 });
 
-app.get("/site/redirect", async (req, res) => {
-  res.json({ oauthUrl: getRedirectUrl("000000") });
-});
-
-app.get("/test/redirect", async (req, res) => {
-  res.redirect("https://ps-strapi.herokuapp.com/");
-});
-
-app.get("/site/check", async (req, res) => {
-  const user = req.session?.user;
-
-  console.log(user);
-
-  res.json({ status: "success", user });
-});
+app.get(
+  "/site/redirect",
+  cors({ origin: CORS_ORIGIN, credentials: true }),
+  async (req, res) => {
+    res.json({ oauthUrl: getRedirectUrl("000000") });
+  }
+);
 
 const port = process.env.PORT || 3000;
 
