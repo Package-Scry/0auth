@@ -208,7 +208,7 @@ app.get("/user", async (req, res) => {
 
   if (!idUser) res.json({ status: "success", user: null })
   else {
-    const user = await getCurrentUser({ _id: idUser })
+    const user = await getCurrentUser({ _id: ObjectId(idUser) })
 
     if (!user) {
       req.session = null
