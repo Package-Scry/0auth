@@ -203,6 +203,14 @@ app.get("/site/redirect", async (req, res) => {
   res.json({ oauthUrl: getRedirectUrl("000000") });
 });
 
+app.get("/logout", async (req, res) => {
+  req.session.destroy(error => {
+    if (error) console.warn(error)
+
+    res.redirect("https://packagescry.com");
+  })
+});
+
 app.get("/user", async (req, res) => {
   const idUser = req.session?.user?.id
 
@@ -211,8 +219,11 @@ app.get("/user", async (req, res) => {
     const user = await getCurrentUser({ _id: ObjectId(idUser) })
 
     if (!user) {
-      req.session = null
-      res.json({ status: "success", user: null })
+      req.session.destroy(error => {
+        if (error) console.warn(error)
+    
+        res.json({ status: "success", user: null })
+      })
     } else {
       const { _id, username } = user
 
