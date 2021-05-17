@@ -214,9 +214,9 @@ app.get("/user", async (req, res) => {
       req.session = null
       res.json({ status: "success", user: null })
     } else {
-      const { id, username } = user
+      const { _id, username } = user
 
-      res.json({ status: "success", user: { id, username } })
+      res.json({ status: "success", user: { id: _id, username } })
     }
 
   }
