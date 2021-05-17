@@ -205,14 +205,10 @@ app.get("/site/redirect", async (req, res) => {
 
 app.get("/user", async (req, res) => {
   const idUser = req.session?.user?.id
-  console.log({ idUser })
-  console.log("---------")
-  console.log(JSON.stringify(req.session?.user, null, 2))
-  console.log("---------")
 
   if (!idUser) res.json({ status: "success", user: null })
   else {
-    const user = await getCurrentUser({ id: idUser })
+    const user = await getCurrentUser({ _id: idUser })
 
     if (!user) {
       req.session = null
