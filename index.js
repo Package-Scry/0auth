@@ -179,7 +179,7 @@ app.get(`${CALLBACK_PATH}000000*`, async (req, res) => {
     id: currentUser._id,
   };
 
-  return res.redirect("https://packagescry.com/login-success");
+  return res.redirect("https://packagescry.com");
 });
 
 app.get(`${CALLBACK_PATH}:idSocket`, async (req, res) => {
