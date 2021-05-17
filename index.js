@@ -203,6 +203,25 @@ app.get("/site/redirect", async (req, res) => {
   res.json({ oauthUrl: getRedirectUrl("000000") });
 });
 
+app.get("/user", async (req, res) => {
+  const idUser = req.session?.user?.id
+
+  if (!idUser) res.json({ status: "success", user: null })
+  else {
+    const user = await getCurrentUser({ id: idUser })
+
+    if (!user) {
+      req.session = null
+      res.json({ status: "success", user: null })
+    } else {
+      const { id, username } = user
+
+      res.json({ status: "success", user: { id, username } })
+    }
+
+  }
+});
+
 const port = process.env.PORT || 3000;
 
 server.listen(port, () => console.log("App listening on port " + port));
