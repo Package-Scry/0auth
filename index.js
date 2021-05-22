@@ -211,7 +211,7 @@ app.get("/logout", async (req, res) => {
   })
 });
 
-app.get("/user", async (req, res) => {
+const authenticate = (req, res, next) => {
   const idUser = req.session?.user?.id
 
   if (!idUser) res.json({ status: "success", user: null })
@@ -227,10 +227,19 @@ app.get("/user", async (req, res) => {
     } else {
       const { _id, username } = user
 
-      res.json({ status: "success", user: { id: _id, username } })
+      res.locals.user = { id: _id, username }
+
+      next()
     }
 
   }
+}
+
+app.get("/user", authenticate, async (req, res) => {
+  const user = res.locals?.user
+
+  res.json({ status: "success", user })
+
 });
 
 const port = process.env.PORT || 3000;
