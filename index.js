@@ -5,6 +5,7 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
+const bodyParser = require('body-parser')
 
 const app = express();
 
@@ -20,6 +21,7 @@ const CORS_ORIGIN = ["https://www.packagescry.com", "https://github.com"];
 const client = new MongoClient(URI, { useUnifiedTopology: true });
 
 app.enable("trust proxy");
+app.use(bodyParser.json())
 app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
 app.use(
   session({
