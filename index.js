@@ -204,46 +204,44 @@ app.get("/site/redirect", async (req, res) => {
 });
 
 app.get("/logout", async (req, res) => {
-  req.session.destroy(error => {
-    if (error) console.warn(error)
+  req.session.destroy((error) => {
+    if (error) console.warn(error);
 
     res.redirect("https://packagescry.com");
-  })
+  });
 });
 
 const authenticate = (req, res, next) => {
-  const idUser = req.session?.user?.id
+  const idUser = req.session?.user?.id;
 
-  if (!idUser) res.json({ status: "success", user: null })
+  if (!idUser) res.json({ status: "success", user: null });
   else {
-    const user = await getCurrentUser({ _id: ObjectId(idUser) })
+    const user = await getCurrentUser({ _id: ObjectId(idUser) });
 
     if (!user) {
-      req.session.destroy(error => {
-        if (error) console.warn(error)
-    
-        res.json({ status: "success", user: null })
-      })
+      req.session.destroy((error) => {
+        if (error) console.warn(error);
+
+        res.json({ status: "success", user: null });
+      });
     } else {
-      const { _id, username } = user
+      const { _id, username } = user;
 
-      res.locals.user = { id: _id, username }
+      res.locals.user = { id: _id, username };
 
-      next()
+      next();
     }
-
   }
-}
+};
 
 app.get("/user", authenticate, async (req, res) => {
-  const user = res.locals?.user
+  const user = res.locals?.user;
 
-  res.json({ status: "success", user })
-
+  res.json({ status: "success", user });
 });
 
 app.get("/subscriptions", authenticate, async (req, res) => {
-  const { id, username } = res.locals?.user
+  const { id, username } = res.locals?.user;
   // TODO: query subscriptions data
 
   res.json({
