@@ -64,13 +64,20 @@ io.use(async (socket, next) => {
 });
 
 const getCurrentUser = async (query) => {
-  const database = client.db("website");
-  const admins = database.collection("strapi_administrator");
-  const users = database.collection("users-permissions_user");
-  const user = await users.findOne(query);
-  const admin = await admins.findOne(query);
+  try {
+    const database = client.db("website");
+    const admins = database.collection("strapi_administrator");
+    const users = database.collection("users-permissions_user");
+    const user = await users.findOne(query);
+    const admin = await admins.findOne(query);
 
-  return user ?? admin;
+    return user ?? admin;
+  } catch (e) {
+    console.error("getCurrentUser");
+    console.error(e);
+
+    return null;
+  }
 };
 
 const createNewUser = async (idGitHub, username) => {
@@ -153,6 +160,9 @@ io.on("connection", async (socket) => {
 
   if (idUser) {
     const currentUser = await getCurrentUser({ _id: ObjectId(idUser) });
+
+    if (!currentUser) return;
+
     const { hasPro } = currentUser;
 
     authenticateWithSocket(socket.id, idUser, hasPro);
@@ -175,9 +185,7 @@ app.get(`${CALLBACK_PATH}000000*`, async (req, res) => {
 
   if (!req.session) req.session = {};
 
-  req.session.user = {
-    id: currentUser._id,
-  };
+  if (currentUser) req.session.user = { id: currentUser._id };
 
   return res.redirect("https://packagescry.com");
 });
@@ -191,7 +199,8 @@ app.get(`${CALLBACK_PATH}:idSocket`, async (req, res) => {
       (await getCurrentUser({ idGitHub })) ??
       (await createNewUser(idGitHub, username));
 
-    authenticateWithSocket(idSocket, currentUser._id, currentUser.hasPro);
+    if (currentUser)
+      authenticateWithSocket(idSocket, currentUser._id, currentUser.hasPro);
 
     return res.send(redirectHtml);
   } catch (error) {
@@ -211,7 +220,7 @@ app.get("/logout", async (req, res) => {
   });
 });
 
-const authenticate = (req, res, next) => {
+const authenticate = async (req, res, next) => {
   const idUser = req.session?.user?.id;
 
   if (!idUser) res.json({ status: "success", user: null });
@@ -234,7 +243,7 @@ const authenticate = (req, res, next) => {
   }
 };
 
-app.get("/user", authenticate, async (req, res) => {
+app.get("/user", authenticate, (req, res) => {
   const user = res.locals?.user;
 
   res.json({ status: "success", user });
