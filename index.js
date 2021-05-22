@@ -242,6 +242,21 @@ app.get("/user", authenticate, async (req, res) => {
 
 });
 
+app.get("/subscriptions", authenticate, async (req, res) => {
+  const { id, username } = res.locals?.user
+  // TODO: query subscriptions data
+
+  res.json({
+    status: "success",
+    subscription: {
+      id: "a2345ds4334a343s",
+      type: "pro",
+      timeperiod: "annual",
+      price: "$58.8",
+    },
+  });
+});
+
 const port = process.env.PORT || 3000;
 
 server.listen(port, () => console.log("App listening on port " + port));
