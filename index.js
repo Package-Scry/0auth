@@ -252,6 +252,7 @@ app.post("/post/contact", authenticate, async (req, res) => {
   const users = database.collection("contacts");
 
   const newContact = {
+    createdAt: new Date(),
     text,
     type,
     created_by: ObjectId(id),
