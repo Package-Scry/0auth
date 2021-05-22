@@ -223,7 +223,7 @@ app.get("/logout", async (req, res) => {
 const authenticate = async (req, res, next) => {
   const idUser = req.session?.user?.id;
 
-  if (!idUser) res.json({ status: "success", user: null });
+  if (!idUser) res.json({ status: "failed", user: null });
   else {
     const user = await getCurrentUser({ _id: ObjectId(idUser) });
 
@@ -231,7 +231,7 @@ const authenticate = async (req, res, next) => {
       req.session.destroy((error) => {
         if (error) console.warn(error);
 
-        res.json({ status: "success", user: null });
+        res.json({ status: "failed", user: null });
       });
     } else {
       const { _id, username } = user;
@@ -242,6 +242,30 @@ const authenticate = async (req, res, next) => {
     }
   }
 };
+
+app.post("/post/contact", authenticate, async (req, res) => {
+  const { id } = res.locals?.user;
+  const { type, text } = req.body;
+  const database = client.db("website");
+  const users = database.collection("contacts");
+
+  const newContact = {
+    text,
+    type,
+    created_by: ObjectId(id),
+    updated_by: ObjectId(id),
+  };
+
+  try {
+    await users.insertOne(newContact);
+
+    res.json({ status: "success" });
+  } catch (error) {
+    console.error("Mongo contact insert error:", error);
+
+    res.json({ status: "failed" });
+  }
+});
 
 app.get("/user", authenticate, (req, res) => {
   const user = res.locals?.user;
