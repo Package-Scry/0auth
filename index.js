@@ -291,6 +291,15 @@ app.get("/subscriptions", authenticate, async (req, res) => {
   });
 });
 
+app.post("/post/subscribe", authenticate, async (req, res) => {
+  const { id, username } = res.locals?.user;
+  // TODO: connect it to db or newsletter service
+
+  res.json({
+    status: "success"
+  });
+});
+
 const port = process.env.PORT || 3000;
 
 server.listen(port, () => console.log("App listening on port " + port));
