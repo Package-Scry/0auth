@@ -291,8 +291,7 @@ app.get("/subscriptions", authenticate, async (req, res) => {
   });
 });
 
-app.post("/post/subscribe", authenticate, async (req, res) => {
-  const { id, username } = res.locals?.user;
+app.post("/post/subscribe", async (req, res) => {
   // TODO: connect it to db or newsletter service
 
   res.json({
