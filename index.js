@@ -5,7 +5,7 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
-const bodyParser = require('body-parser')
+const bodyParser = require("body-parser");
 
 const app = express();
 
@@ -21,7 +21,7 @@ const CORS_ORIGIN = ["https://www.packagescry.com", "https://github.com"];
 const client = new MongoClient(URI, { useUnifiedTopology: true });
 
 app.enable("trust proxy");
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
 app.use(
   session({
@@ -295,8 +295,23 @@ app.post("/post/subscribe", async (req, res) => {
   // TODO: connect it to db or newsletter service
 
   res.json({
-    status: "success"
+    status: "success",
   });
+});
+
+app.get("/unsub/:hash", async (req, res) => {
+  const { hash } = req.params;
+  const database = client.db("website");
+  const collectionEmail = database.collection("email");
+
+  try {
+    await collectionEmail.findOneAndDelete({ unsubHash: hash });
+
+    res.redirect("https://packagescry.com/unsubbed");
+  } catch (error) {
+    console.error(error);
+    res.json({ status: "failed" });
+  }
 });
 
 const port = process.env.PORT || 3000;
