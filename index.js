@@ -337,10 +337,7 @@ app.get("/latest", async (req, res) => {
   try {
     const url =
       "https://package-scry.sfo3.digitaloceanspaces.com/releases/latest-mac.yml";
-    const response = await axios.get(url)
-
-    console.log(response)
-
+    const response = await axios.get(url);
     const doc = yaml.load(response.data);
     const macUrl = `https://package-scry.sfo3.digitaloceanspaces.com/releases/Package%20Scry-${doc.version}.dmg`;
 
