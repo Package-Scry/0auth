@@ -9,10 +9,11 @@ const bodyParser = require("body-parser");
 const crypto = require("crypto");
 const yaml = require("js-yaml");
 const fs = require("fs");
+const http = require("http");
 
 const app = express();
 
-const server = require("http").createServer(app);
+const server = http.createServer(app);
 const io = require("socket.io")(server);
 
 const ID_CLIENT = process.env.CLIENT_ID;
@@ -334,15 +335,14 @@ app.get("/unsub/:hash", async (req, res) => {
 
 app.get("/latest", async (req, res) => {
   try {
-    const doc = yaml.load(
-      fs.readFileSync(
-        "https://package-scry.sfo3.digitaloceanspaces.com/releases/latest-mac.yml",
-        "utf8"
-      )
-    );
-    const macUrl = `https://package-scry.sfo3.digitaloceanspaces.com/releases/Package%20Scry-${doc.version}.dmg`;
+    const url =
+      "https://package-scry.sfo3.digitaloceanspaces.com/releases/latest-mac.yml";
+    const response = await axios.get(url)
 
-    res.json({ status: "success", url: { mac: macUrl } });
+    console.log(response)
+
+
+    res.json({ status: "success", url: { mac: "macUrl" } });
   } catch (error) {
     console.error(error);
 
