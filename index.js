@@ -6,6 +6,7 @@ const MongoStore = require("connect-mongo");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const crypto = require("crypto");
 
 const app = express();
 
@@ -292,11 +293,26 @@ app.get("/subscriptions", authenticate, async (req, res) => {
 });
 
 app.post("/post/subscribe", async (req, res) => {
-  // TODO: connect it to db or newsletter service
+  const { email } = req.body;
+  const database = client.db("website");
+  const collectionEmail = database.collection("email");
+  const unsubHash = crypto.randomBytes(60).toString("hex");
 
-  res.json({
-    status: "success",
-  });
+  try {
+    const newEmail = {
+      email,
+      unsubHash,
+    };
+
+    await collectionEmail.insertOne(newEmail);
+
+    res.json({
+      status: "success",
+    });
+  } catch (error) {
+    console.error(error);
+    res.json({ status: "failed" });
+  }
 });
 
 app.get("/unsub/:hash", async (req, res) => {
