@@ -341,8 +341,10 @@ app.get("/latest", async (req, res) => {
 
     console.log(response)
 
+    const doc = yaml.load(response.data);
+    const macUrl = `https://package-scry.sfo3.digitaloceanspaces.com/releases/Package%20Scry-${doc.version}.dmg`;
 
-    res.json({ status: "success", url: { mac: "macUrl" } });
+    res.json({ status: "success", url: { mac: macUrl } });
   } catch (error) {
     console.error(error);
 
