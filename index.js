@@ -7,6 +7,8 @@ const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const crypto = require("crypto");
+const yaml = require("js-yaml");
+const fs = require("fs");
 
 const app = express();
 
@@ -326,6 +328,24 @@ app.get("/unsub/:hash", async (req, res) => {
     res.redirect("https://packagescry.com/unsubbed");
   } catch (error) {
     console.error(error);
+    res.json({ status: "failed" });
+  }
+});
+
+app.get("/latest", async (req, res) => {
+  try {
+    const doc = yaml.load(
+      fs.readFileSync(
+        "https://package-scry.sfo3.digitaloceanspaces.com/releases/latest-mac.yml",
+        "utf8"
+      )
+    );
+    const macUrl = `https://package-scry.sfo3.digitaloceanspaces.com/releases/Package%20Scry-${doc.version}.dmg`;
+
+    res.json({ status: "success", url: { mac: macUrl } });
+  } catch (error) {
+    console.error(error);
+
     res.json({ status: "failed" });
   }
 });
