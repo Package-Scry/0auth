@@ -261,6 +261,7 @@ app.post("/post/contact", authenticate, async (req, res) => {
     type,
     created_by: ObjectId(id),
     updated_by: ObjectId(id),
+    idUser: ObjectId(id)
   };
 
   try {
