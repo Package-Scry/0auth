@@ -304,6 +304,7 @@ app.post("/post/subscribe", async (req, res) => {
 
   try {
     const newEmail = {
+      createdAt: new Date(),
       email,
       unsubHash,
     };
