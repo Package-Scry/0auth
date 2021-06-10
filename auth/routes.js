@@ -1,5 +1,6 @@
+const { ObjectId } = require("mongodb");
 const { app } = require("../app");
-const { createNewUser, getCurrentUser } = require("../controllers");
+const { createNewUser, isAdmin, getCurrentUser } = require("../controllers");
 const { getGitHubData, getRedirectUrl } = require("../utils");
 const { authenticateWithSocket } = require("./index");
 
@@ -32,7 +33,17 @@ module.exports = () => {
   app.get(`${CALLBACK_PATH}metrics*`, async (req, res) => {
     await webLogin(req);
 
-    return res.redirect("https://ps-metrics.herokuapp.com/");
+    const idUser = req.session.user?.id;
+    const hasPermission = await isAdmin(idUser);
+
+    if (hasPermission) return res.redirect("https://ps-metrics.herokuapp.com/");
+    else {
+      req.session.destroy((error) => {
+        if (error) console.warn(error);
+
+        return res.redirect("https://packagescry.com");
+      });
+    }
   });
 
   app.get(`${CALLBACK_PATH}:idSocket`, async (req, res) => {
