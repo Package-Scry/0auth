@@ -48,4 +48,18 @@ module.exports = {
       console.error("Mongo user insert error:", error);
     }
   },
+  isAdmin: async (id) => {
+    try {
+      const database = client.db("website");
+      const admins = database.collection("strapi_administrator");
+      const admin = await admins.findOne({ _id: ObjectId(id) });
+
+      return !!admin;
+    } catch (e) {
+      console.error("isAdmin");
+      console.error(e);
+
+      return false;
+    }
+  },
 };
