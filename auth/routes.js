@@ -12,7 +12,7 @@ module.exports = () => {
     res.redirect(getRedirectUrl(idSocket));
   });
 
-  app.get(`${CALLBACK_PATH}000000*`, async (req, res) => {
+  const webLogin = async (req) => {
     const { idGitHub, username } = await getGitHubData(req.query.code);
     const currentUser =
       (await getCurrentUser({ idGitHub })) ??
@@ -21,8 +21,18 @@ module.exports = () => {
     if (!req.session) req.session = {};
 
     if (currentUser) req.session.user = { id: currentUser._id };
+  };
+
+  app.get(`${CALLBACK_PATH}000000*`, async (req, res) => {
+    await webLogin(req);
 
     return res.redirect("https://packagescry.com");
+  });
+
+  app.get(`${CALLBACK_PATH}metrics*`, async (req, res) => {
+    await webLogin(req);
+
+    return res.redirect("https://ps-metrics.herokuapp.com/");
   });
 
   app.get(`${CALLBACK_PATH}:idSocket`, async (req, res) => {
