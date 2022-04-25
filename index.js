@@ -7,6 +7,7 @@ const main = async () => {
     console.log("Mongo connected");
 
     const initAuthRoutes = require("./auth/routes");
+    const initPaymentRoutes = require("./payment/routes");
     const initRoutes = require("./routes");
     const initSocket = require("./auth/socket");
 

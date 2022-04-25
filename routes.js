@@ -14,21 +14,6 @@ module.exports = () => {
     res.json({ status: "success", user });
   });
 
-  app.get("/subscriptions", authenticate, async (req, res) => {
-    const { id, username } = res.locals?.user;
-    // TODO: query subscriptions data
-
-    res.json({
-      status: "success",
-      subscription: {
-        id: "a2345ds4334a343s",
-        type: "pro",
-        timeperiod: "annual",
-        price: "$58.8",
-      },
-    });
-  });
-
   app.get("/latest", async (req, res) => {
     try {
       const url =
