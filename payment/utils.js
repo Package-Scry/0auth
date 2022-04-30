@@ -44,4 +44,19 @@ module.exports = {
       throw { message: error.message, type: "STRIPE_CREATE_SUBSCRIPTION" }
     }
   },
+  createEvent: async () => {
+    try {
+      return stripe.webhooks.constructEvent(
+        req.body,
+        req.headers["stripe-signature"],
+        process.env.STRIPE_WEBHOOK_SECRET || ""
+      )
+    } catch (err) {
+      console.log(err)
+      console.log(`⚠️  Webhook signature verification failed.`)
+      console.log(
+        `⚠️  Check the env file and enter the correct webhook secret.`
+      )
+    }
+  },
 }
