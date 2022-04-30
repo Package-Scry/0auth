@@ -4,6 +4,7 @@ const stripe = require("stripe")(STRIPE_API_KEY)
 
 const STRIPE_MONTHLY_ID = "price_1KsZ4ZEbki2GiZihrbfz68np"
 const STRIPE_YEARLY_ID = "price_1KsZ4ZEbki2GiZihRGuM1sPR"
+const TRIAL_AMOUNT_DAYS = 30
 
 module.exports = {
   createStripeCustomer: async (id) => {
@@ -34,6 +35,7 @@ module.exports = {
         ],
         payment_behavior: "default_incomplete",
         expand: ["latest_invoice.payment_intent"],
+        trial_period_days: TRIAL_AMOUNT_DAYS,
       })
 
       return {
