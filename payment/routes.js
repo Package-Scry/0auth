@@ -1,28 +1,25 @@
-const axios = require("axios");
-const { ObjectId } = require("mongodb");
-
-const { app } = require("./app");
-const { authenticate } = require("./auth");
+const { app } = require("../app")
+const { authenticate } = require("../auth")
+const { createStripeCustomer, createStripeSubscription } = require("./utils")
 
 module.exports = () => {
-  app.post("/subscribe", authenticate, (req, res) => {
-    const user = res.locals?.user;
+  app.post("/create-subscription", authenticate, async (req, res) => {
+    const { id, idPrice } = res.locals?.user
 
-    res.json({ status: "success", user });
-  });
+    try {
+      const { customer } = await createStripeCustomer(id)
+      const { idSubscription, clientSecret } = await createStripeSubscription(
+        customer.id,
+        idPrice
+      )
 
-  app.get("/subscriptions", authenticate, async (req, res) => {
-    const { id, username } = res.locals?.user;
-    // TODO: query subscriptions data
-
-    res.json({
-      status: "success",
-      subscription: {
-        id: "a2345ds4334a343s",
-        type: "pro",
-        timeperiod: "annual",
-        price: "$58.8",
-      },
-    });
-  });
-};
+      res.json({
+        status: "success",
+        subscription: { clientSecret, id: idSubscription },
+      })
+    } catch (error) {
+      console.log("Stripe `error.type` error", e)
+      res.json({ status: "failed", message: "Payment failed." })
+    }
+  })
+}
