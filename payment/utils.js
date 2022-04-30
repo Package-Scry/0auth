@@ -21,4 +21,27 @@ module.exports = {
       throw { message: error.message, type: "STRIPE_CREATE_CUSTOMER" }
     }
   },
+  createStripeSubscription: async (idCustomer, period) => {
+    const idPrice = period === "monthly" ? STRIPE_MONTHLY_ID : STRIPE_YEARLY_ID
+
+    try {
+      const subscription = await stripe.subscriptions.create({
+        customer: idCustomer,
+        items: [
+          {
+            price: idPrice,
+          },
+        ],
+        payment_behavior: "default_incomplete",
+        expand: ["latest_invoice.payment_intent"],
+      })
+
+      return {
+        idSubscription: subscription.id,
+        clientSecret: subscription.latest_invoice.payment_intent.client_secret,
+      }
+    } catch (error) {
+      throw { message: error.message, type: "STRIPE_CREATE_SUBSCRIPTION" }
+    }
+  },
 }
