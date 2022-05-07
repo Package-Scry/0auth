@@ -1,8 +1,8 @@
-const axios = require("axios");
-const APP_BASE_URL = "https://package-scry.herokuapp.com";
-const ID_CLIENT = process.env.CLIENT_ID;
-const CALLBACK_PATH = `/auth/github/callback/`;
-const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const axios = require("axios")
+const APP_BASE_URL = "https://shimmering-marshmallow-1232f7.netlify.app/"
+const ID_CLIENT = process.env.CLIENT_ID
+const CALLBACK_PATH = `/auth/github/callback/`
+const CLIENT_SECRET = process.env.CLIENT_SECRET
 
 module.exports = {
   getRedirectUrl: (idSocket) =>
@@ -12,28 +12,28 @@ module.exports = {
       client_id: ID_CLIENT,
       client_secret: CLIENT_SECRET,
       code,
-    };
-    const options = { headers: { accept: "application/json" } };
+    }
+    const options = { headers: { accept: "application/json" } }
 
     try {
       const response = await axios.post(
         `https://github.com/login/oauth/access_token`,
         body,
         options
-      );
-      const token = response.data.access_token;
+      )
+      const token = response.data.access_token
       const { data } = await axios({
         method: "get",
         url: `https://api.github.com/user`,
         headers: {
           Authorization: "token " + token,
         },
-      });
-      const { id: idGitHub, login: username } = data;
+      })
+      const { id: idGitHub, login: username } = data
 
-      return { idGitHub, username };
+      return { idGitHub, username }
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
   },
-};
+}
