@@ -1,5 +1,5 @@
 const axios = require("axios")
-const APP_BASE_URL = "https://shimmering-marshmallow-1232f7.netlify.app/"
+const APP_BASE_URL = "https://package-scry.onrender.com/"
 const ID_CLIENT = process.env.CLIENT_ID
 const CALLBACK_PATH = `/auth/github/callback/`
 const CLIENT_SECRET = process.env.CLIENT_SECRET
