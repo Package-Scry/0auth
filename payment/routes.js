@@ -5,6 +5,7 @@ const {
   createStripeSubscription,
   createEvent,
 } = require("./utils")
+const bodyParser = require("body-parser")
 
 module.exports = () => {
   app.post("/create-subscription", authenticate, async (req, res) => {
