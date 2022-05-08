@@ -45,7 +45,7 @@ module.exports = {
       throw { message: error.message, type: "STRIPE_CREATE_SUBSCRIPTION" }
     }
   },
-  createEvent: async () => {
+  createEvent: async (req) => {
     try {
       return stripe.webhooks.constructEvent(
         req.body,
