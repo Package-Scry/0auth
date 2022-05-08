@@ -1,5 +1,4 @@
-const STRIPE_API_KEY =
-  "sk_test_51KsYyOEbki2GiZiheTB6mpTMnydGHLFGx15Ut8orjMl0jhjgfhyRNJvAqLT9WMqKIZRzZ4ACNQ5IcTwv3e1KCfgr00FMgcfW1b"
+const STRIPE_API_KEY = process.env.STRIPE_TEST_KEY
 const stripe = require("stripe")(STRIPE_API_KEY)
 
 const STRIPE_MONTHLY_ID = "price_1KsZ4ZEbki2GiZihrbfz68np"
