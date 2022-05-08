@@ -30,6 +30,7 @@ module.exports = () => {
       "/stripe-webhook",
       bodyParser.raw({ type: "application/json" }),
       async (req, res) => {
+        console.log("STRIPE WEBHOOK")
         const event = await createEvent(req)
 
         // Extract the object from the event.
@@ -69,6 +70,8 @@ module.exports = () => {
             console.log(JSON.stringify(dataObject, null, 2))
             break
           case "customer.subscription.deleted":
+            console.log("SUB DELETED")
+            console.log(JSON.stringify(dataObject, null, 2))
             if (event.request != null) {
               // remove from db -- unsubbed
             } else {
