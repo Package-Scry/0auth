@@ -5,7 +5,6 @@ const {
   createStripeSubscription,
   createEvent,
 } = require("./utils")
-const bodyParser = require("body-parser")
 
 module.exports = () => {
   app.post("/create-subscription", authenticate, async (req, res) => {
@@ -30,13 +29,13 @@ module.exports = () => {
 
   app.post(
     "/stripe-webhook",
-    bodyParser.raw({ type: "application/json" }),
+    express.raw({ type: "application/json" }),
     async (req, res) => {
       console.log("STRIPE WEBHOOK")
       const event = await createEvent(req)
 
       // Extract the object from the event.
-      const dataObject = event.data.object
+      const dataObject = event?.data?.object
 
       switch (event.type) {
         case "invoice.payment_succeeded":
