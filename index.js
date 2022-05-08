@@ -1,26 +1,27 @@
-const { server } = require("./app");
-const client = require("./client");
+const { server } = require("./app")
+const client = require("./client")
 
 const main = async () => {
   try {
-    await client.connect();
-    console.log("Mongo connected");
+    await client.connect()
+    console.log("Mongo connected")
 
-    const initAuthRoutes = require("./auth/routes");
-    const initPaymentRoutes = require("./payment/routes");
-    const initRoutes = require("./routes");
-    const initSocket = require("./auth/socket");
+    const initAuthRoutes = require("./auth/routes")
+    const initPaymentRoutes = require("./payment/routes")
+    const initRoutes = require("./routes")
+    const initSocket = require("./auth/socket")
 
-    initAuthRoutes();
-    initRoutes();
-    initSocket();
+    initAuthRoutes()
+    initPaymentRoutes()
+    initRoutes()
+    initSocket()
 
-    const port = process.env.PORT || 3000;
+    const port = process.env.PORT || 3000
 
-    server.listen(port, () => console.log("App listening on port " + port));
+    server.listen(port, () => console.log("App listening on port " + port))
   } catch (error) {
-    console.log("DB connect error:", error);
+    console.log("DB connect error:", error)
   }
-};
+}
 
-main();
+main()
