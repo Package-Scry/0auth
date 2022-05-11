@@ -58,6 +58,7 @@ module.exports = {
       console.log(
         `⚠️  Check the env file and enter the correct webhook secret.`
       )
+      response.status(400).send(`Webhook Error: ${err.message}`)
     }
   },
 }

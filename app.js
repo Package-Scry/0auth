@@ -14,7 +14,13 @@ const app = express()
 const server = http.createServer(app)
 
 app.enable("trust proxy")
-app.use(express.json())
+app.use((req, res, next) => {
+  if (req.originalUrl === "/stripe-webhook") {
+    next()
+  } else {
+    express.json()(req, res, next)
+  }
+})
 app.use(cors({ origin: CORS_ORIGIN, credentials: true }))
 app.use(
   session({
