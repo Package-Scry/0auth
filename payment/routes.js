@@ -83,8 +83,7 @@ module.exports = () => {
         default:
         // Unexpected event type
       }
-      response.json({ received: true })
-      // res.json({ status: "failed", message: "..." })
+      res.json({ received: true })
     }
   )
 }
