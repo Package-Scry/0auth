@@ -83,7 +83,7 @@ module.exports = () => {
         default:
         // Unexpected event type
       }
-      res.json({ received: true })
+      res.send()
     }
   )
 }
