@@ -4,13 +4,34 @@ const stripe = require("stripe")(STRIPE_API_KEY)
 const STRIPE_MONTHLY_ID = "price_1KsZ4ZEbki2GiZihrbfz68np"
 const STRIPE_YEARLY_ID = "price_1KsZ4ZEbki2GiZihRGuM1sPR"
 const TRIAL_AMOUNT_DAYS = 30
+const lookup = require("country-code-lookup")
+
+const convertBillingCountryToISO = (country) => lookup.byCountry(country)
 
 module.exports = {
-  createStripeCustomer: async (id) => {
+  createStripeCustomer: async (id, billingDetails) => {
     try {
+      const { country, ...billingDetailsWithoutCountry } = billingDetails
+      const countrISO = convertBillingCountryToISO(country)
+
+      console("BILLING DETAILS")
+      console({
+        country: countrISO,
+        ...billingDetailsWithoutCountry,
+      })
+
+      if (!countrISO)
+        throw { message: "Invalid country", type: "STRIPE_CREATE_CUSTOMER" }
+
+      return
+
       const customer = await stripe.customers.create({
         metadata: {
           idUser: id,
+        },
+        ...{
+          country: countrISO,
+          ...billingDetailsWithoutCountry,
         },
       })
 

@@ -9,13 +9,29 @@ const express = require("express")
 
 module.exports = () => {
   app.post("/create-subscription", authenticate, async (req, res) => {
-    const { id, idPrice } = res.locals?.user
+    const { id } = res.locals?.user
+    const { billingDetails } = req.body
+    const BILLING_FIELDS = [
+      "email",
+      "fullname",
+      "city",
+      "address",
+      "country",
+      "period",
+    ]
+
+    if (
+      !billingDetails ||
+      BILLING_FIELDS.some((field) => !billingDetails[field])
+    )
+      return res.json({ status: "failed", message: "Missing fields" })
 
     try {
-      const { customer } = await createStripeCustomer(id)
+      const { customer } = await createStripeCustomer(id, billingDetails)
+      throw { message: "test", type: "ASD " }
       const { idSubscription, clientSecret } = await createStripeSubscription(
         customer.id,
-        idPrice
+        billingDetails.period
       )
 
       res.json({
@@ -43,22 +59,21 @@ module.exports = () => {
           if (dataObject.billing_reason === "subscription_create") {
             console.log("PAYMENT SUCCEEDED")
             console.log(JSON.stringify(dataObject, null, 2))
-            return
             // save hasPro to db
-            const subscription_id = dataObject.subscription
-            const payment_intent_id = dataObject.payment_intent
+            // const subscription_id = dataObject.subscription
+            // const payment_intent_id = dataObject.payment_intent
 
             // Retrieve the payment intent used to pay the subscription
-            const payment_intent = await stripe.paymentIntents.retrieve(
-              payment_intent_id
-            )
+            // const payment_intent = await stripe.paymentIntents.retrieve(
+            //   payment_intent_id
+            // )
 
-            const subscription = await stripe.subscriptions.update(
-              subscription_id,
-              {
-                default_payment_method: payment_intent.payment_method,
-              }
-            )
+            // const subscription = await stripe.subscriptions.update(
+            //   subscription_id,
+            //   {
+            //     default_payment_method: payment_intent.payment_method,
+            //   }
+            // )
           }
           break
         case "invoice.paid":
