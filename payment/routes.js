@@ -20,6 +20,9 @@ module.exports = () => {
       "period",
     ]
 
+    console.log("details")
+    console.log(billingDetails)
+
     if (
       !billingDetails ||
       BILLING_FIELDS.some((field) => !billingDetails[field])
