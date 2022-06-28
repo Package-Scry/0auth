@@ -42,7 +42,7 @@ module.exports = () => {
         subscription: { clientSecret, id: idSubscription },
       })
     } catch (error) {
-      console.log("Stripe `error.type` error", e)
+      console.log("Stripe `error.type` error", error)
       res.json({ status: "failed", message: "Payment failed." })
     }
   })
