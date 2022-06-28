@@ -8,7 +8,7 @@ const {
 const express = require("express")
 
 module.exports = () => {
-  app.post("/create-subscription", authenticate, async (req, res) => {
+  app.post("/post/create-subscription", authenticate, async (req, res) => {
     const { id } = res.locals?.user
     const { billingDetails } = req.body
     const BILLING_FIELDS = [
@@ -45,7 +45,7 @@ module.exports = () => {
   })
 
   app.post(
-    "/stripe-webhook",
+    "/post/stripe-webhook",
     express.raw({ type: "application/json" }),
     async (req, res) => {
       console.log("STRIPE WEBHOOK")
