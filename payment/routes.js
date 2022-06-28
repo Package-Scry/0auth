@@ -13,7 +13,7 @@ module.exports = () => {
     const { billingDetails } = req.body
     const BILLING_FIELDS = [
       "email",
-      "fullname",
+      "name",
       "city",
       "address",
       "country",
