@@ -14,8 +14,8 @@ module.exports = {
       const { country, ...billingDetailsWithoutCountry } = billingDetails
       const countrISO = convertBillingCountryToISO(country)
 
-      console("BILLING DETAILS")
-      console({
+      console.log("BILLING DETAILS")
+      console.log({
         country: countrISO,
         ...billingDetailsWithoutCountry,
       })
