@@ -37,7 +37,7 @@ module.exports = {
 
       return { customer }
     } catch (error) {
-      console.log("Stripe `createCustomer` error", e)
+      console.log("Stripe `createCustomer` error", error)
 
       throw { message: error.message, type: "STRIPE_CREATE_CUSTOMER" }
     }
@@ -73,13 +73,13 @@ module.exports = {
         req.headers["stripe-signature"],
         process.env.STRIPE_WEBHOOK_SECRET || ""
       )
-    } catch (err) {
-      console.log(err)
+    } catch (error) {
+      console.log(error)
       console.log(`⚠️  Webhook signature verification failed.`)
       console.log(
         `⚠️  Check the env file and enter the correct webhook secret.`
       )
-      response.status(400).send(`Webhook Error: ${err.message}`)
+      response.status(400).send(`Webhook Error: ${error.message}`)
     }
   },
 }
