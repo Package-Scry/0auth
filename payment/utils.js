@@ -6,7 +6,8 @@ const STRIPE_YEARLY_ID = "price_1KsZ4ZEbki2GiZihRGuM1sPR"
 const TRIAL_AMOUNT_DAYS = 30
 const lookup = require("country-code-lookup")
 
-const convertBillingCountryToISO = (country) => lookup.byCountry(country)
+const convertBillingCountryToISO = (country) =>
+  lookup.byCountry(country)?.["iso2"]
 
 module.exports = {
   createStripeCustomer: async (id, billingDetails) => {
