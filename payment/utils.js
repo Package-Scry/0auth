@@ -60,6 +60,9 @@ module.exports = {
         trial_period_days: TRIAL_AMOUNT_DAYS,
       })
 
+      console.log("sub")
+      console.log(subscription)
+
       return {
         idSubscription: subscription.id,
         clientSecret: subscription.latest_invoice.payment_intent.client_secret,
