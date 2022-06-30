@@ -71,7 +71,7 @@ module.exports = {
       throw { message: error.message, type: "STRIPE_CREATE_SUBSCRIPTION" }
     }
   },
-  createEvent: (req) => {
+  createEvent: (req, res) => {
     try {
       return stripe.webhooks.constructEvent(
         req.body,
@@ -84,7 +84,7 @@ module.exports = {
       console.log(
         `⚠️  Check the env file and enter the correct webhook secret.`
       )
-      response.status(400).send(`Webhook Error: ${error.message}`)
+      res.status(400).send(`Webhook Error: ${error.message}`)
     }
   },
 }

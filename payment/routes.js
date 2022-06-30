@@ -54,7 +54,7 @@ module.exports = () => {
     express.raw({ type: "application/json" }),
     async (req, res) => {
       console.log("STRIPE WEBHOOK")
-      const event = createEvent(req)
+      const event = createEvent(req, res)
 
       // Extract the object from the event.
       const dataObject = event?.data?.object
