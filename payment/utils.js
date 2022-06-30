@@ -28,7 +28,7 @@ module.exports = {
 
       const customer = await stripe.customers.create({
         metadata: {
-          idUser: id,
+          idUser: id.toString(),
         },
         ...customerDetailsWithoutAddress,
         address: {
