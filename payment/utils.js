@@ -28,7 +28,7 @@ module.exports = {
         metadata: {
           idUser: id,
         },
-        ...{
+        address: {
           country: countrISO,
           ...billingDetailsWithoutCountry,
         },

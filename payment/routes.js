@@ -15,7 +15,7 @@ module.exports = () => {
       "email",
       "name",
       "city",
-      "address",
+      "line1",
       "country",
       "period",
     ]
