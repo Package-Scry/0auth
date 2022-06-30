@@ -66,8 +66,7 @@ module.exports = {
 
       return {
         idSubscription: subscription.id,
-        clientSecret:
-          subscription.latest_invoice.pending_setup_intent.client_secret,
+        clientSecret: subscription.pending_setup_intent.client_secret,
       }
     } catch (error) {
       throw { message: error.message, type: "STRIPE_CREATE_SUBSCRIPTION" }
