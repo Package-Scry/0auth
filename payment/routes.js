@@ -31,11 +31,17 @@ module.exports = () => {
 
     try {
       const { customer } = await createStripeCustomer(id, billingDetails)
-      throw { message: "test", type: "ASD " }
+
+      console.log("customer")
+      console.log(customer)
+
       const { idSubscription, clientSecret } = await createStripeSubscription(
         customer.id,
         billingDetails.period
       )
+
+      console.log("sub")
+      console.log(idSubscription, clientSecret)
 
       res.json({
         status: "success",

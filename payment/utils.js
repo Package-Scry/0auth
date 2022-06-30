@@ -24,8 +24,6 @@ module.exports = {
       if (!countrISO)
         throw { message: "Invalid country", type: "STRIPE_CREATE_CUSTOMER" }
 
-      return
-
       const customer = await stripe.customers.create({
         metadata: {
           idUser: id,
