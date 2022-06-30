@@ -19,7 +19,7 @@ module.exports = {
       console.log("BILLING DETAILS")
       console.log({
         country: countrISO,
-        ...billingDetailsWithoutCountry,
+        ...addressWithoutCountry,
       })
 
       if (!countrISO)
