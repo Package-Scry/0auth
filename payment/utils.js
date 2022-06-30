@@ -10,9 +10,10 @@ const convertBillingCountryToISO = (country) =>
   lookup.byCountry(country)?.["iso2"]
 
 module.exports = {
-  createStripeCustomer: async (id, billingDetails) => {
+  createStripeCustomer: async (id, customerDetails) => {
     try {
-      const { address, ...billingDetailsWithoutAddress } = billingDetails
+      const { address, period, ...customerDetailsWithoutAddress } =
+        customerDetails
       const { country, ...addressWithoutCountry } = address
       const countrISO = convertBillingCountryToISO(country)
 
@@ -29,7 +30,7 @@ module.exports = {
         metadata: {
           idUser: id,
         },
-        ...billingDetailsWithoutAddress,
+        ...customerDetailsWithoutAddress,
         address: {
           country: countrISO,
           ...addressWithoutCountry,

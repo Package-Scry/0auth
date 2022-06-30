@@ -25,14 +25,15 @@ module.exports = () => {
       return res.json({ status: "failed", message: "Missing fields" })
 
     try {
-      const { customer } = await createStripeCustomer(id, billingDetails)
+      const { period, ...customerDetails } = billingDetails
+      const { customer } = await createStripeCustomer(id, customerDetails)
 
       console.log("customer")
       console.log(customer)
 
       const { idSubscription, clientSecret } = await createStripeSubscription(
         customer.id,
-        billingDetails.period
+        period
       )
 
       console.log("sub")
