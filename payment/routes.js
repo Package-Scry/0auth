@@ -11,21 +11,16 @@ module.exports = () => {
   app.post("/post/create-subscription", authenticate, async (req, res) => {
     const { id } = res.locals?.user
     const { billingDetails } = req.body
-    const BILLING_FIELDS = [
-      "email",
-      "name",
-      "city",
-      "line1",
-      "country",
-      "period",
-    ]
+    const BILLING_FIELDS = ["email", "name", "address", "period"]
+    const ADDRESS_FIELDS = ["city", "line1", "country"]
 
     console.log("details")
     console.log(billingDetails)
 
     if (
       !billingDetails ||
-      BILLING_FIELDS.some((field) => !billingDetails[field])
+      BILLING_FIELDS.some((field) => !billingDetails[field]) ||
+      ADDRESS_FIELDS.some((field) => !billingDetails.address[field])
     )
       return res.json({ status: "failed", message: "Missing fields" })
 

@@ -12,7 +12,8 @@ const convertBillingCountryToISO = (country) =>
 module.exports = {
   createStripeCustomer: async (id, billingDetails) => {
     try {
-      const { country, ...billingDetailsWithoutCountry } = billingDetails
+      const { address, ...billingDetailsWithoutAddress } = billingDetails
+      const { country, ...addressWithoutCountry } = address
       const countrISO = convertBillingCountryToISO(country)
 
       console.log("BILLING DETAILS")
@@ -28,9 +29,10 @@ module.exports = {
         metadata: {
           idUser: id,
         },
+        ...billingDetailsWithoutAddress,
         address: {
           country: countrISO,
-          ...billingDetailsWithoutCountry,
+          ...addressWithoutCountry,
         },
       })
 
