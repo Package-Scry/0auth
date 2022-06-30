@@ -59,7 +59,7 @@ module.exports = () => {
       // Extract the object from the event.
       const dataObject = event?.data?.object
 
-      switch (event.type) {
+      switch (event?.type) {
         case "invoice.payment_succeeded":
           if (dataObject.billing_reason === "subscription_create") {
             console.log("PAYMENT SUCCEEDED")

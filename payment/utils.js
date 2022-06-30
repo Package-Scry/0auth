@@ -56,7 +56,7 @@ module.exports = {
           },
         ],
         payment_behavior: "default_incomplete",
-        expand: ["latest_invoice.payment_intent"],
+        expand: ["pending_setup_intent"],
         payment_settings: { save_default_payment_method: "on_subscription" },
         trial_period_days: TRIAL_AMOUNT_DAYS,
       })
