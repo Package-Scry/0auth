@@ -10,14 +10,14 @@ const express = require("express")
 
 module.exports = () => {
   app.post("/post/create-subscription", authenticate, async (req, res) => {
-    console.log("buy")
-    await checkout()
-    return
     const { id } = res.locals?.user
     const { billingDetails } = req.body
     const BILLING_FIELDS = ["email", "name", "address", "period"]
     const ADDRESS_FIELDS = ["city", "line1", "country"]
 
+    console.log("buy")
+    await checkout(billingDetails.period)
+    return
     console.log("details")
     console.log(billingDetails)
 
