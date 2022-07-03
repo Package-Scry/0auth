@@ -16,7 +16,7 @@ module.exports = () => {
     const ADDRESS_FIELDS = ["city", "line1", "country"]
 
     console.log("buy")
-    await checkout(billingDetails.period)
+    await checkout(billingDetails.period, res)
     return
     console.log("details")
     console.log(billingDetails)

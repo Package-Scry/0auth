@@ -10,7 +10,7 @@ const convertBillingCountryToISO = (country) =>
   lookup.byCountry(country)?.["iso2"]
 
 module.exports = {
-  checkout: async (period) => {
+  checkout: async (period, res) => {
     const idPrice = period === "monthly" ? STRIPE_MONTHLY_ID : STRIPE_YEARLY_ID
 
     try {
