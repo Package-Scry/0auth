@@ -55,23 +55,23 @@ module.exports = () => {
     express.raw({ type: "application/json" }),
     async (req, res) => {
       console.log("STRIPE WEBHOOK")
-      let event = request.body
+      let event = req.body
       // Only verify the event if you have an endpoint secret defined.
       // Otherwise use the basic event deserialized with JSON.parse
       const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || ""
       console.log({ endpointSecret })
       if (endpointSecret) {
         // Get the signature sent by Stripe
-        const signature = request.headers["stripe-signature"]
+        const signature = req.headers["stripe-signature"]
         try {
           event = stripe.webhooks.constructEvent(
-            request.body,
+            req.body,
             signature,
             endpointSecret
           )
         } catch (err) {
           console.log(`⚠️  Webhook signature verification failed.`, err.message)
-          return response.sendStatus(400)
+          return res.sendStatus(400)
         }
       }
 
@@ -95,8 +95,8 @@ module.exports = () => {
           console.log(`Unhandled event type ${event.type}.`)
       }
 
-      // Return a 200 response to acknowledge receipt of the event
-      response.send()
+      // Return a 200 res to acknowledge receipt of the event
+      res.send()
     }
   )
 }
