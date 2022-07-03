@@ -15,7 +15,7 @@ const server = http.createServer(app)
 
 app.enable("trust proxy")
 app.use((req, res, next) => {
-  if (req.originalUrl === "/stripe-webhook") {
+  if (req.originalUrl === "/post/stripe-webhook") {
     next()
   } else {
     express.json()(req, res, next)
