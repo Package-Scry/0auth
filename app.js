@@ -7,7 +7,11 @@ const MongoStore = require("connect-mongo")
 
 const URI = process.env.MONGO_URI
 const CLIENT_SECRET = process.env.CLIENT_SECRET
-const CORS_ORIGIN = ["https://www.packagescry.com", "https://github.com"]
+const CORS_ORIGIN = [
+  "https://www.packagescry.com",
+  "https://github.com",
+  "https://checkout.stripe.com",
+]
 
 const app = express()
 
