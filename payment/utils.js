@@ -10,6 +10,38 @@ const convertBillingCountryToISO = (country) =>
   lookup.byCountry(country)?.["iso2"]
 
 module.exports = {
+  checkout: async () => {
+    const idPrice = period === "monthly" ? STRIPE_MONTHLY_ID : STRIPE_YEARLY_ID
+
+    try {
+      const session = await stripe.checkout.sessions.create({
+        mode: "subscription",
+        line_items: [
+          {
+            price: idPrice,
+            quantity: 1,
+          },
+        ],
+        subscription_data: {
+          trial_period_days: TRIAL_AMOUNT_DAYS,
+        },
+        // {CHECKOUT_SESSION_ID} is a string literal; do not change it!
+        // the actual Session ID is returned in the query parameter when your customer
+        // is redirected to the success page.
+        success_url:
+          "https://packagecry.com/success?session_id={CHECKOUT_SESSION_ID}",
+        cancel_url: "https://packagecry.com/canceled",
+      })
+
+      console.log("striped")
+      res.redirect(303, session.url)
+    } catch (error) {
+      console.log("Stripe `createCustomer` error", error)
+
+      res.json({ status: "fAILED" })
+      // throw { message: error.message, type: "STRIPE_CREATE_CUSTOMER" }
+    }
+  },
   createStripeCustomer: async (id, customerDetails) => {
     try {
       const { address, period, ...customerDetailsWithoutAddress } =
