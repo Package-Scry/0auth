@@ -1,6 +1,6 @@
 const { app } = require("../app")
 const { authenticate } = require("../auth")
-const { checkout, createEvent } = require("./utils")
+const { STRIPE_YEARLY_ID, checkout, createEvent } = require("./utils")
 const express = require("express")
 
 module.exports = () => {
@@ -39,12 +39,15 @@ module.exports = () => {
             console.log("PAYMENT SUCCEEDED")
             console.log(JSON.stringify(dataObject, null, 2))
 
-            const metadata = dataObject.metadata
-            const metadata2 = dataObject.lines.data.metadata
+            const { idUser } = dataObject.lines.data[0].metadata
+            const period =
+              dataObject.lines.data[0].price.id === STRIPE_YEARLY_ID
+                ? "annual"
+                : "monthly"
 
-            console.log("META")
-            console.log(metadata)
-            console.log(metadata2)
+            io.to(`plan${idUser}`).emit("planUpdated", {
+              shouldRefresh: true,
+            })
             // save hasPro to db
             // const subscription_id = dataObject.subscription
             // const payment_intent_id = dataObject.payment_intent
