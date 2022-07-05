@@ -80,32 +80,23 @@ module.exports = {
       throw { message: error.message, type: "STRIPE_CREATE_CUSTOMER" }
     }
   },
-  createStripeSubscription: async (idCustomer, period) => {
-    const idPrice = period === "monthly" ? STRIPE_MONTHLY_ID : STRIPE_YEARLY_ID
-
+  getStripeSubscription: async (idSubscription) => {
     try {
-      const subscription = await stripe.subscriptions.create({
-        customer: idCustomer,
-        items: [
-          {
-            price: idPrice,
-          },
-        ],
-        payment_behavior: "default_incomplete",
-        expand: ["pending_setup_intent"],
-        payment_settings: { save_default_payment_method: "on_subscription" },
-        trial_period_days: TRIAL_AMOUNT_DAYS,
-      })
+      const subscription = await stripe.subscriptions.retrieve(idSubscription)
 
       console.log("sub")
       console.log(subscription)
 
       return {
         idSubscription: subscription.id,
-        clientSecret: subscription.pending_setup_intent.client_secret,
+        period:
+          subscription.items.data[0].price.id === STRIPE_YEARLY_ID
+            ? "annual"
+            : "monthly",
+        status: subscription.status,
       }
     } catch (error) {
-      throw { message: error.message, type: "STRIPE_CREATE_SUBSCRIPTION" }
+      throw { message: error.message, type: "STRIPE_GET_SUBSCRIPTION" }
     }
   },
   createEvent: (req, res) => {
