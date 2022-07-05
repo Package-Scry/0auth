@@ -35,8 +35,7 @@ module.exports = {
         // {CHECKOUT_SESSION_ID} is a string literal; do not change it!
         // the actual Session ID is returned in the query parameter when your customer
         // is redirected to the success page.
-        success_url:
-          "https://packagecry.com/success?session_id={CHECKOUT_SESSION_ID}",
+        success_url: "https://packagecry.com/payment-success",
         cancel_url: "https://packagecry.com/canceled",
       })
 
