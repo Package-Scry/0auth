@@ -1,11 +1,6 @@
 const { app } = require("../app")
 const { authenticate } = require("../auth")
-const {
-  checkout,
-  createStripeCustomer,
-  createStripeSubscription,
-  createEvent,
-} = require("./utils")
+const { checkout, createEvent } = require("./utils")
 const express = require("express")
 
 module.exports = () => {
@@ -14,31 +9,17 @@ module.exports = () => {
     const { period } = req.body
 
     console.log("buy")
-    await checkout(period, res)
-    return
 
     try {
-      const { period, ...customerDetails } = billingDetails
-      const { customer } = await createStripeCustomer(id, customerDetails)
-
-      console.log("customer")
-      console.log(customer)
-
-      const { idSubscription, clientSecret } = await createStripeSubscription(
-        customer.id,
-        period
-      )
-
-      console.log("sub")
-      console.log(idSubscription, clientSecret)
+      const checkoutURL = await checkout(id, period)
 
       res.json({
         status: "success",
-        subscription: { clientSecret, id: idSubscription },
+        checkoutURL,
       })
     } catch (error) {
       console.log("Stripe `error.type` error", error)
-      res.json({ status: "failed", message: "Payment failed." })
+      res.json({ status: "failed", message: "Checkout failed." })
     }
   })
 
