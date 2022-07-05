@@ -38,6 +38,13 @@ module.exports = () => {
           if (dataObject.billing_reason === "subscription_create") {
             console.log("PAYMENT SUCCEEDED")
             console.log(JSON.stringify(dataObject, null, 2))
+
+            const metadata = dataObject.metadata
+            const metadata2 = dataObject.lines.data.metadata
+
+            console.log("META")
+            console.log(metadata)
+            console.log(metadata2)
             // save hasPro to db
             // const subscription_id = dataObject.subscription
             // const payment_intent_id = dataObject.payment_intent
