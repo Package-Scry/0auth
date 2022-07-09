@@ -53,8 +53,11 @@ module.exports = {
     const database = client.db("website")
     const users = database.collection("users-permissions_user")
 
+    console.log("updating user", id)
+    console.log("updating user", userWithoutId)
+
     try {
-      await users.updateOne({ _id: id }, { $set: { ...userWithoutId } })
+      await users.updateOne({ idGitHub: id }, { $set: { ...userWithoutId } })
     } catch (error) {
       console.error("Mongo user update error:", error)
     }

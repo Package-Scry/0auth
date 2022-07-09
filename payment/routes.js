@@ -53,16 +53,16 @@ module.exports = () => {
         case "invoice.paid":
           // save to db
           console.log("INVOICE PAID")
-          console.log(JSON.stringify(dataObject, null, 2))
+          // console.log(JSON.stringify(dataObject, null, 2))
           break
         case "invoice.payment_failed":
           // warn
           console.log("PAYMENT FAILED")
-          console.log(JSON.stringify(dataObject, null, 2))
+          // console.log(JSON.stringify(dataObject, null, 2))
           break
         case "customer.subscription.deleted":
           console.log("SUB DELETED")
-          console.log(JSON.stringify(dataObject, null, 2))
+          // console.log(JSON.stringify(dataObject, null, 2))
           if (event.request != null) {
             // remove from db -- unsubbed
           } else {
