@@ -38,7 +38,7 @@ module.exports = () => {
         case "invoice.payment_succeeded":
           if (dataObject.billing_reason === "subscription_create") {
             console.log("PAYMENT SUCCEEDED")
-            console.log(JSON.stringify(dataObject, null, 2))
+            // console.log(JSON.stringify(dataObject, null, 2))
 
             const { idUser } = dataObject.lines.data[0].metadata
             const period =
