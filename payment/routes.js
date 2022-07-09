@@ -3,6 +3,7 @@ const { authenticate } = require("../auth")
 const { STRIPE_YEARLY_ID, checkout, createEvent } = require("./utils")
 const express = require("express")
 const io = require("../socket")
+const { updateUser } = require("../controllers")
 
 module.exports = () => {
   app.post("/post/checkout", authenticate, async (req, res) => {
@@ -46,24 +47,7 @@ module.exports = () => {
                 ? "annual"
                 : "monthly"
 
-            io.to(`plan${idUser}`).emit("planUpdated", {
-              shouldRefresh: true,
-            })
-            // save hasPro to db
-            // const subscription_id = dataObject.subscription
-            // const payment_intent_id = dataObject.payment_intent
-
-            // Retrieve the payment intent used to pay the subscription
-            // const payment_intent = await stripe.paymentIntents.retrieve(
-            //   payment_intent_id
-            // )
-
-            // const subscription = await stripe.subscriptions.update(
-            //   subscription_id,
-            //   {
-            //     default_payment_method: payment_intent.payment_method,
-            //   }
-            // )
+            await updateUser({ id: idUser, hasPro: true, period })
           }
           break
         case "invoice.paid":
