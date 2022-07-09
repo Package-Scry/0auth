@@ -57,7 +57,7 @@ module.exports = {
     console.log("updating user", userWithoutId)
 
     try {
-      await users.updateOne({ idGitHub: id }, { $set: { ...userWithoutId } })
+      await users.updateOne({ _id: id }, { $set: { ...userWithoutId } })
     } catch (error) {
       console.error("Mongo user update error:", error)
     }
