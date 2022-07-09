@@ -2,6 +2,7 @@ const { app } = require("../app")
 const { authenticate } = require("../auth")
 const { STRIPE_YEARLY_ID, checkout, createEvent } = require("./utils")
 const express = require("express")
+const io = require("../socket")
 
 module.exports = () => {
   app.post("/post/checkout", authenticate, async (req, res) => {
