@@ -60,9 +60,6 @@ module.exports = () => {
       switch (event?.type) {
         case "invoice.payment_succeeded":
           if (dataObject.billing_reason === "subscription_create") {
-            console.log("PAYMENT SUCCEEDED")
-            // console.log(JSON.stringify(dataObject, null, 2))
-
             const { idUser } = dataObject.lines.data[0].metadata
             const period =
               dataObject.lines.data[0].price.id === STRIPE_YEARLY_ID
@@ -84,11 +81,12 @@ module.exports = () => {
           break
         case "customer.subscription.deleted":
           console.log("SUB DELETED")
-          // console.log(JSON.stringify(dataObject, null, 2))
-          if (event.request != null) {
-            // remove from db -- unsubbed
-          } else {
+          const { idUser } = dataObject.lines.data[0].metadata
+          if (event.request != null)
+            await updateUser({ id: idUser, hasPro: false, period: null })
+          else {
             // remove from db -- unsubbed automatically
+            await updateUser({ id: idUser, hasPro: false, period: null })
           }
           break
         default:
