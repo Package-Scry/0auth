@@ -81,7 +81,7 @@ module.exports = () => {
           break
         case "customer.subscription.deleted":
           console.log("SUB DELETED")
-          const { idUser } = dataObject.lines.data[0].metadata
+          const { idUser } = dataObject.metadata
           if (event.request != null)
             await updateUser({ id: idUser, hasPro: false, period: null })
           else {
