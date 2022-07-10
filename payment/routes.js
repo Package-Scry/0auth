@@ -1,6 +1,11 @@
 const { app } = require("../app")
 const { authenticate } = require("../auth")
-const { STRIPE_YEARLY_ID, checkout, createEvent } = require("./utils")
+const {
+  STRIPE_YEARLY_ID,
+  checkout,
+  createEvent,
+  getPortalLink,
+} = require("./utils")
 const express = require("express")
 const { updateUser } = require("../controllers")
 
@@ -11,22 +16,11 @@ module.exports = () => {
     console.log("portal")
 
     try {
-      const subscription = await stripe.subscriptions.search({
-        query: `metadata['idUser']:'${id}'`,
-      })
-
-      const { customer, id: idSubscription } = subscription?.data?.[0]
-
-      if (!idSubscription)
-        throw { message: "No subscription", type: "STRIPE_GET_PORTAL_LINK" }
-
-      const portalSession = await stripe.billingPortal.sessions.create({
-        customer,
-      })
+      const portalUrl = await getPortalLink(id)
 
       res.json({
         status: "success",
-        portalUrl: portalSession.url,
+        portalUrl,
       })
     } catch (error) {
       console.log("Stripe `error.type` error", error)

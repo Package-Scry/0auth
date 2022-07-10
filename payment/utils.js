@@ -80,6 +80,22 @@ module.exports = {
       throw { message: error.message, type: "STRIPE_CREATE_CUSTOMER" }
     }
   },
+  getPortalLink: async (idUser) => {
+    const subscription = await stripe.subscriptions.search({
+      query: `metadata['idUser']:'${idUser}'`,
+    })
+
+    const { customer, id: idSubscription } = subscription?.data?.[0]
+
+    if (!idSubscription)
+      throw { message: "No subscription", type: "STRIPE_GET_PORTAL_LINK" }
+
+    const portalSession = await stripe.billingPortal.sessions.create({
+      customer,
+    })
+
+    return portalSession.url
+  },
   getStripeSubscription: async (idSubscription) => {
     try {
       const subscription = await stripe.subscriptions.retrieve(idSubscription)
