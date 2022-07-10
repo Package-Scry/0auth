@@ -10,7 +10,7 @@ const express = require("express")
 const { updateUser } = require("../controllers")
 
 module.exports = () => {
-  app.get("/stripe-portal-link", authenticate, async (req, res) => {
+  app.get("/subscriptions", authenticate, async (req, res) => {
     const { id } = res.locals?.user
 
     console.log("portal")
