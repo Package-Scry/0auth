@@ -2,10 +2,38 @@ const { app } = require("../app")
 const { authenticate } = require("../auth")
 const { STRIPE_YEARLY_ID, checkout, createEvent } = require("./utils")
 const express = require("express")
-const io = require("../socket")
 const { updateUser } = require("../controllers")
 
 module.exports = () => {
+  app.get("/stripe-portal-link", authenticate, async (req, res) => {
+    const { id } = res.locals?.user
+
+    console.log("portal")
+
+    try {
+      const subscription = await stripe.subscriptions.search({
+        query: `metadata['idUser']:'${id}'`,
+      })
+
+      const { customer, id: idSubscription } = subscription?.data?.[0]
+
+      if (!idSubscription)
+        throw { message: "No subscription", type: "STRIPE_GET_PORTAL_LINK" }
+
+      const portalSession = await stripe.billingPortal.sessions.create({
+        customer,
+      })
+
+      res.json({
+        status: "success",
+        portalUrl: portalSession.url,
+      })
+    } catch (error) {
+      console.log("Stripe `error.type` error", error)
+      res.json({ status: "failed", message: "Getting portal link failed." })
+    }
+  })
+
   app.post("/post/checkout", authenticate, async (req, res) => {
     const { id } = res.locals?.user
     const { period } = req.body
