@@ -1,12 +1,14 @@
-const STRIPE_API_KEY = process.env.STRIPE_TEST_KEY
-const stripe = require("stripe")(STRIPE_API_KEY)
-const { Request, Response } = require("express")
+const STRIPE_API_KEY = process.env.STRIPE_TEST_KEY ?? ""
+import Stripe from "stripe"
+import { Request, Response } from "express"
+import { ObjectId } from "mongodb"
 
 const STRIPE_MONTHLY_ID = "price_1KsZ4ZEbki2GiZihrbfz68np"
 const STRIPE_YEARLY_ID = "price_1KsZ4ZEbki2GiZihRGuM1sPR"
 const TRIAL_AMOUNT_DAYS = 30
-const { ObjectId } = require("mongodb")
-const lookup = require("country-code-lookup")
+const stripe = new Stripe(STRIPE_API_KEY, {
+  apiVersion: "2020-08-27",
+})
 
 enum PlanPeriods {
   Monthly = "monthly",
@@ -16,9 +18,6 @@ enum PlanPeriods {
 type CommonError = {
   message: string
 }
-
-const convertBillingCountryToISO = (country: string) =>
-  lookup.byCountry(country)?.["iso2"]
 
 module.exports = {
   STRIPE_YEARLY_ID,
@@ -65,19 +64,22 @@ module.exports = {
     })
 
     const { customer, id: idSubscription } = subscription?.data?.[0]
+    const idCustomer = typeof customer === "string" ? customer : customer.id
 
     if (!idSubscription)
       throw { message: "No subscription", type: "STRIPE_GET_PORTAL_LINK" }
 
     const portalSession = await stripe.billingPortal.sessions.create({
-      customer,
+      customer: idCustomer,
     })
 
     return portalSession.url
   },
-  getStripeSubscription: async (idSubscription: typeof ObjectId) => {
+  getStripeSubscription: async (idSubscription: ObjectId) => {
     try {
-      const subscription = await stripe.subscriptions.retrieve(idSubscription)
+      const subscription = await stripe.subscriptions.retrieve(
+        idSubscription.toString()
+      )
 
       console.log("sub")
       console.log(subscription)
@@ -95,11 +97,11 @@ module.exports = {
       throw { message: error.message, type: "STRIPE_GET_SUBSCRIPTION" }
     }
   },
-  createEvent: (req: typeof Request, res: typeof Response) => {
+  createEvent: (req: Request, res: Response) => {
     try {
       return stripe.webhooks.constructEvent(
         req.body,
-        req.headers["stripe-signature"],
+        req.headers["stripe-signature"] ?? "",
         process.env.STRIPE_WEBHOOK_SECRET || ""
       )
     } catch (e) {
