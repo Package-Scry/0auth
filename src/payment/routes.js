@@ -1,5 +1,5 @@
 const { app } = require("../../app")
-const { authenticate } = require("../../auth")
+const { authenticate } = require("../auth")
 const {
   STRIPE_YEARLY_ID,
   checkout,
