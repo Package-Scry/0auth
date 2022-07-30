@@ -1,4 +1,4 @@
-const { app } = require("../../app")
+const { app } = require("../app")
 const { authenticate } = require("../auth")
 const {
   STRIPE_YEARLY_ID,
@@ -7,7 +7,7 @@ const {
   getPortalLink,
 } = require("./utils")
 const express = require("express")
-const { updateUser } = require("../../controllers")
+const { updateUser } = require("../controllers")
 
 module.exports = () => {
   app.get("/subscriptions", authenticate, async (req, res) => {
