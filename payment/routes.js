@@ -92,6 +92,7 @@ module.exports = () => {
         default:
         // Unexpected event type
       }
+
       res.send()
     }
   )
