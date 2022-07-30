@@ -43,4 +43,4 @@ app.use(
   })
 )
 
-module.exports = { app, server }
+export { app, server }
