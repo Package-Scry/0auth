@@ -2,10 +2,12 @@ const STRIPE_API_KEY = process.env.STRIPE_TEST_KEY ?? ""
 import Stripe from "stripe"
 import { Request, Response } from "express"
 import { ObjectId } from "mongodb"
+import {
+  STRIPE_MONTHLY_ID,
+  STRIPE_YEARLY_ID,
+  TRIAL_AMOUNT_DAYS,
+} from "./constants"
 
-const STRIPE_MONTHLY_ID = "price_1KsZ4ZEbki2GiZihrbfz68np"
-export const STRIPE_YEARLY_ID = "price_1KsZ4ZEbki2GiZihRGuM1sPR"
-const TRIAL_AMOUNT_DAYS = 30
 const stripe = new Stripe(STRIPE_API_KEY, {
   apiVersion: "2020-08-27",
 })
