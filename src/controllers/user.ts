@@ -2,28 +2,49 @@ import { ObjectId } from "mongodb"
 import client from "../client"
 import { PlanPeriods } from "../payment/constants"
 
-type UserQuery = {
-  _id: ObjectId
+type User = {
+  idGitHub: string
+  createdAt: Date
+  hasPro: boolean
+  lastPaidAt: Date
+  username: string
+  password: string
+  confirmed: boolean
+  blocked: boolean
+  created_by: ObjectId
+  role: ObjectId
+  updated_by: ObjectId
+  period: PlanPeriods
 }
 
-export const getCurrentUser = async (query: UserQuery) => {
+type UserQuery =
+  | {
+      _id: ObjectId
+      idGitHub?: never
+    }
+  | {
+      _id?: never
+      idGitHub: string
+    }
+
+export const getUser = async (query: UserQuery) => {
   try {
     const database = client.db("website")
     const admins = database.collection("strapi_administrator")
     const users = database.collection("users-permissions_user")
-    const user = await users.findOne(query)
-    const admin = await admins.findOne(query)
+    const user = await users.findOne<User>(query)
+    const admin = await admins.findOne<User>(query)
 
     return user ?? admin
   } catch (e) {
-    console.error("getCurrentUser")
+    console.error("getUser")
     console.error(e)
 
     return null
   }
 }
 
-export const createNewUser = async (idGitHub: string, username: string) => {
+export const createUser = async (idGitHub: string, username: string) => {
   const database = client.db("website")
   const users = database.collection("users-permissions_user")
 
@@ -46,11 +67,12 @@ export const createNewUser = async (idGitHub: string, username: string) => {
   try {
     const { insertedId } = await users.insertOne(newUser)
 
-    return await getCurrentUser({ _id: insertedId })
+    return await getUser({ _id: insertedId })
   } catch (error) {
     console.error("Mongo user insert error:", error)
   }
 }
+
 export const updateUser = async (user: {
   id: ObjectId
   hasPro: boolean
@@ -72,6 +94,7 @@ export const updateUser = async (user: {
     console.error("Mongo user update error:", error)
   }
 }
+
 export const isAdmin = async (id: string) => {
   try {
     const database = client.db("website")
