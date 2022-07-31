@@ -6,16 +6,12 @@ import {
   STRIPE_MONTHLY_ID,
   STRIPE_YEARLY_ID,
   TRIAL_AMOUNT_DAYS,
+  PlanPeriods,
 } from "./constants"
 
 const stripe = new Stripe(STRIPE_API_KEY, {
   apiVersion: "2020-08-27",
 })
-
-enum PlanPeriods {
-  Monthly = "monthly",
-  Yearly = "yearly",
-}
 
 type CommonError = {
   message: string
