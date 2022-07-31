@@ -1,8 +1,8 @@
-const express = require("express")
-const cors = require("cors")
-const http = require("http")
-const session = require("express-session")
-const MongoStore = require("connect-mongo")
+import express from "express"
+import cors from "cors"
+import http from "http"
+import session from "express-session"
+import MongoStore from "connect-mongo"
 
 const URI = process.env.MONGO_URI
 const CLIENT_SECRET = process.env.CLIENT_SECRET
@@ -27,7 +27,7 @@ app.use((req, res, next) => {
 app.use(cors({ origin: CORS_ORIGIN, credentials: true }))
 app.use(
   session({
-    secret: CLIENT_SECRET,
+    secret: CLIENT_SECRET ?? "",
     saveUninitialized: false,
     resave: false,
     cookie: {
@@ -43,4 +43,4 @@ app.use(
   })
 )
 
-export { app, server }
+export default { app, server }
