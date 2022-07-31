@@ -43,4 +43,4 @@ app.use(
   })
 )
 
-export default { app, server }
+export { app, server }
