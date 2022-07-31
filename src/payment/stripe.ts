@@ -1,8 +1,8 @@
-const STRIPE_API_KEY = process.env.STRIPE_TEST_KEY ?? ""
 import Stripe from "stripe"
 import { Request, Response } from "express"
 import { ObjectId } from "mongodb"
 import {
+  STRIPE_API_KEY,
   STRIPE_MONTHLY_ID,
   STRIPE_YEARLY_ID,
   TRIAL_AMOUNT_DAYS,
