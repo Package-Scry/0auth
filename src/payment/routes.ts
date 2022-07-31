@@ -1,16 +1,13 @@
-const { app } = require("../app")
-const { authenticate } = require("../auth")
-const {
-  STRIPE_YEARLY_ID,
-  checkout,
-  createEvent,
-  getPortalLink,
-} = require("./utils")
-const express = require("express")
+import express, { Request, Response } from "express"
+import { app } from "../app"
+import { authenticate } from "../auth"
+import { STRIPE_YEARLY_ID } from "./constants"
+import { checkout, createEvent, getPortalLink } from "./utils"
+
 const { updateUser } = require("../controllers")
 
 module.exports = () => {
-  app.get("/subscriptions", authenticate, async (req, res) => {
+  app.get("/subscriptions", authenticate, async (_: Request, res: Response) => {
     const { id } = res.locals?.user
 
     console.log("portal")
@@ -28,29 +25,33 @@ module.exports = () => {
     }
   })
 
-  app.post("/post/checkout", authenticate, async (req, res) => {
-    const { id } = res.locals?.user
-    const { period } = req.body
+  app.post(
+    "/post/checkout",
+    authenticate,
+    async (req: Request, res: Response) => {
+      const { id } = res.locals?.user
+      const { period } = req.body
 
-    console.log("buy")
+      console.log("buy")
 
-    try {
-      const checkoutURL = await checkout(id, period)
+      try {
+        const checkoutURL = await checkout(id, period)
 
-      res.json({
-        status: "success",
-        checkoutURL,
-      })
-    } catch (error) {
-      console.log("Stripe `error.type` error", error)
-      res.json({ status: "failed", message: "Checkout failed." })
+        res.json({
+          status: "success",
+          checkoutURL,
+        })
+      } catch (error) {
+        console.log("Stripe `error.type` error", error)
+        res.json({ status: "failed", message: "Checkout failed." })
+      }
     }
-  })
+  )
 
   app.post(
     "/post/stripe-webhook",
     express.raw({ type: "application/json" }),
-    async (req, res) => {
+    async (req: Request, res: Response) => {
       console.log("STRIPE WEBHOOK")
       const event = createEvent(req, res)
 
@@ -59,9 +60,12 @@ module.exports = () => {
 
       switch (event?.type) {
         case "invoice.payment_succeeded":
-          if (dataObject.billing_reason === "subscription_create") {
+          // @ts-ignore https://github.com/stripe/stripe-node/issues/1387
+          if (dataObject?.billing_reason === "subscription_create") {
+            // @ts-ignore
             const { idUser } = dataObject.lines.data[0].metadata
             const period =
+              // @ts-ignore
               dataObject.lines.data[0].price.id === STRIPE_YEARLY_ID
                 ? "annual"
                 : "monthly"
@@ -81,6 +85,7 @@ module.exports = () => {
           break
         case "customer.subscription.deleted":
           console.log("SUB DELETED")
+          // @ts-ignore
           const { idUser } = dataObject.metadata
           if (event.request != null)
             await updateUser({ id: idUser, hasPro: false, period: null })
