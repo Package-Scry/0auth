@@ -2,7 +2,7 @@ import express, { Request, Response } from "express"
 import { app } from "../app"
 import { authenticate } from "../auth"
 import { STRIPE_YEARLY_ID } from "./constants"
-import { checkout, createEvent, getPortalLink } from "./utils"
+import { checkout, createEvent, getPortalLink } from "./stripe"
 
 const { updateUser } = require("../controllers")
 
