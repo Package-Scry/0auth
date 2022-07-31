@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb"
-import client from "./client"
-import { PlanPeriods } from "./payment/constants"
+import client from "../client"
+import { PlanPeriods } from "../payment/constants"
 
 type UserQuery = {
   _id: ObjectId
