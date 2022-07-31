@@ -1,7 +1,12 @@
-const { ObjectId } = require("mongodb")
-const client = require("./client")
+import { ObjectId } from "mongodb"
+import client from "./client"
+import { PlanPeriods } from "./payment/constants"
 
-const getCurrentUser = async (query) => {
+type UserQuery = {
+  _id: ObjectId
+}
+
+const getCurrentUser = async (query: UserQuery) => {
   try {
     const database = client.db("website")
     const admins = database.collection("strapi_administrator")
@@ -20,7 +25,7 @@ const getCurrentUser = async (query) => {
 
 module.exports = {
   getCurrentUser,
-  createNewUser: async (idGitHub, username) => {
+  createNewUser: async (idGitHub: string, username: string) => {
     const database = client.db("website")
     const users = database.collection("users-permissions_user")
 
@@ -35,9 +40,9 @@ module.exports = {
       confirmed: true,
       blocked: false,
       provider: "local",
-      created_by: ObjectId("605b9add8e10cc7b4c37930a"),
-      role: ObjectId("605b9a5d8e10cc7b4c379234"),
-      updated_by: ObjectId("605b9add8e10cc7b4c37930a"),
+      created_by: new ObjectId("605b9add8e10cc7b4c37930a"),
+      role: new ObjectId("605b9a5d8e10cc7b4c379234"),
+      updated_by: new ObjectId("605b9add8e10cc7b4c37930a"),
     }
 
     try {
@@ -48,7 +53,11 @@ module.exports = {
       console.error("Mongo user insert error:", error)
     }
   },
-  updateUser: async (user) => {
+  updateUser: async (user: {
+    id: ObjectId
+    hasPro: boolean
+    period: null | PlanPeriods
+  }) => {
     const { id, ...userWithoutId } = user
     const database = client.db("website")
     const users = database.collection("users-permissions_user")
@@ -58,18 +67,18 @@ module.exports = {
 
     try {
       await users.updateOne(
-        { _id: ObjectId(id) },
+        { _id: new ObjectId(id) },
         { $set: { ...userWithoutId } }
       )
     } catch (error) {
       console.error("Mongo user update error:", error)
     }
   },
-  isAdmin: async (id) => {
+  isAdmin: async (id: string) => {
     try {
       const database = client.db("website")
       const admins = database.collection("strapi_administrator")
-      const admin = await admins.findOne({ _id: ObjectId(id) })
+      const admin = await admins.findOne({ _id: new ObjectId(id) })
 
       return !!admin
     } catch (e) {
