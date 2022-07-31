@@ -3,6 +3,7 @@ import client from "../client"
 import { PlanPeriods } from "../payment/constants"
 
 type User = {
+  _id: ObjectId
   idGitHub: string
   createdAt: Date
   hasPro: boolean

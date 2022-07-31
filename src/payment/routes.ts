@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express"
 import { app } from "../app"
-import { authenticate } from "../auth"
+import { authenticate } from "../auth/authenticate"
 import { STRIPE_YEARLY_ID } from "./constants"
 import { checkout, createEvent, getPortalLink } from "./stripe"
 
