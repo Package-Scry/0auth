@@ -3,7 +3,7 @@ import cors from "cors"
 import http from "http"
 import session from "express-session"
 import MongoStore from "connect-mongo"
-import { CORS_ORIGIN, CLIENT_SECRET } from "./constants"
+import { CORS_ORIGIN, CLIENT_SECRET, MONGO_URI } from "./constants"
 
 const app = express()
 
@@ -29,7 +29,7 @@ app.use(
       secure: true,
     },
     store: MongoStore.create({
-      mongoUrl: URI,
+      mongoUrl: MONGO_URI,
       ttl: 14 * 24 * 60 * 60,
       touchAfter: 24 * 60 * 60,
     }),
