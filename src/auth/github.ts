@@ -1,8 +1,10 @@
 import axios from "axios"
-const APP_BASE_URL = process.env.APP_BASE_URL
-const ID_CLIENT = process.env.CLIENT_ID
-const CALLBACK_PATH = `/auth/github/callback/`
-const CLIENT_SECRET = process.env.CLIENT_SECRET
+import {
+  ID_CLIENT,
+  APP_BASE_URL,
+  CALLBACK_PATH,
+  CLIENT_SECRET,
+} from "./constants"
 
 type CommonError = {
   message: string
