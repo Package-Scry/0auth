@@ -3,14 +3,7 @@ import cors from "cors"
 import http from "http"
 import session from "express-session"
 import MongoStore from "connect-mongo"
-
-const URI = process.env.MONGO_URI
-const CLIENT_SECRET = process.env.CLIENT_SECRET
-const CORS_ORIGIN = [
-  "https://www.packagescry.com",
-  "https://github.com",
-  "https://checkout.stripe.com",
-]
+import { CORS_ORIGIN, CLIENT_SECRET } from "./constants"
 
 const app = express()
 
