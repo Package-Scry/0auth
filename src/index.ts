@@ -1,5 +1,5 @@
-const { server } = require("./app")
-const client = require("./client")
+import { server } from "./app"
+import client from "./client"
 
 const main = async () => {
   try {
