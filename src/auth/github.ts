@@ -4,6 +4,10 @@ const ID_CLIENT = process.env.CLIENT_ID
 const CALLBACK_PATH = `/auth/github/callback/`
 const CLIENT_SECRET = process.env.CLIENT_SECRET
 
+type CommonError = {
+  message: string
+}
+
 export const getRedirectUrl = (idSocket: string) =>
   `https://github.com/login/oauth/authorize?client_id=${ID_CLIENT}&redirect_uri=${APP_BASE_URL}${CALLBACK_PATH}${idSocket}`
 
@@ -32,7 +36,10 @@ export const getGitHubData = async (code: string) => {
     const { id: idGitHub, login: username } = data
 
     return { idGitHub, username }
-  } catch (error) {
-    console.error(error)
+  } catch (e) {
+    const error = e as CommonError
+    console.log("GitHub `login` error", error)
+
+    throw { message: error.message, type: "GITHUB_LOGIN_ERROR" }
   }
 }

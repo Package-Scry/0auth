@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 import { app } from "../app"
 import { createUser, getUser } from "../controllers/user"
-import { getGitHubData, getRedirectUrl } from "../utils.js"
+import { getGitHubData, getRedirectUrl } from "./github"
 import { authenticateWithSocket } from "./authenticate"
 import { CALLBACK_PATH } from "./constants"
 
@@ -12,28 +12,39 @@ module.exports = () => {
     res.redirect(getRedirectUrl(idSocket))
   })
 
+  // TODO: refactor return
   const webLogin = async (req: Request) => {
-    const { idGitHub, username } = await getGitHubData(req.query.code)
-    const currentUser =
-      (await getUser({ idGitHub })) ?? (await createUser(idGitHub, username))
+    try {
+      const { idGitHub, username } = await getGitHubData(
+        req.query.code as string
+      )
+      const currentUser =
+        (await getUser({ idGitHub })) ?? (await createUser(idGitHub, username))
 
-    // @ts-ignore
-    if (!req.session) req.session = {}
+      // @ts-ignore
+      if (!req.session) req.session = {}
 
-    if (currentUser) req.session.user = { id: currentUser._id }
+      if (currentUser) req.session.user = { id: currentUser._id }
+
+      return ""
+    } catch (e) {
+      return "/login"
+    }
   }
 
   app.get(`${CALLBACK_PATH}000000*`, async (req: Request, res: Response) => {
-    await webLogin(req)
+    const redirectUrl = await webLogin(req)
 
-    return res.redirect("https://packagescry.com")
+    return res.redirect(`https://packagescry.com${redirectUrl}`)
   })
 
   app.get(`${CALLBACK_PATH}:idSocket`, async (req: Request, res: Response) => {
     const { idSocket } = req.params
 
     try {
-      const { idGitHub, username } = await getGitHubData(req.query.code)
+      const { idGitHub, username } = await getGitHubData(
+        req.query.code as string
+      )
       const currentUser =
         (await getUser({ idGitHub })) ?? (await createUser(idGitHub, username))
 
