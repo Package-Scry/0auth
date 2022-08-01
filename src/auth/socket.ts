@@ -1,17 +1,19 @@
-const jwt = require("jsonwebtoken")
-const { ObjectId } = require("mongodb")
+import jwt from "jsonwebtoken"
+import { ObjectId } from "mongodb"
 
-const io = require("../socket")
-const { getCurrentUser } = require("../controllers")
-const { authenticateWithSocket } = require("./index")
+import io from "../socket"
+import { getUser } from "../controllers/user"
+import { authenticateWithSocket } from "./authenticate"
 
 module.exports = () => {
   io.use(async (socket, next) => {
     try {
       const token = socket.handshake.query.token
 
-      if (!!token) {
-        const { id } = jwt.verify(token, process.env.SECRET)
+      if (!!token && typeof token === "string") {
+        // @ts-ignore
+        const { id } = jwt.verify(token, process.env.SECRET ?? "")
+        // @ts-ignore
         socket.idUser = id
       }
     } catch (err) {
@@ -36,7 +38,7 @@ module.exports = () => {
       console.log(`client ${id} connected`)
       socket.join(id)
 
-      const currentUser = await getCurrentUser({ _id: ObjectId(idUser) })
+      const currentUser = await getUser({ _id: new ObjectId(idUser) })
 
       if (!currentUser) return
 
