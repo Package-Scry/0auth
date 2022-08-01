@@ -9,7 +9,7 @@ const signJWT = (idUser: string) =>
   jwt.sign({ id: idUser }, JWT_SECRET, { expiresIn: "7d" })
 
 export const authenticate = async (
-  req: Request & { session: { user: { id: string } } },
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
