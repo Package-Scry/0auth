@@ -4,6 +4,7 @@ import { ObjectId } from "mongodb"
 import io from "../socket"
 import { getUser } from "../controllers/user"
 import { authenticateWithSocket } from "./authenticate"
+import { JWT_SECRET } from "./constants"
 
 module.exports = () => {
   io.use(async (socket, next) => {
@@ -12,7 +13,7 @@ module.exports = () => {
 
       if (!!token && typeof token === "string") {
         // @ts-ignore
-        const { id } = jwt.verify(token, process.env.SECRET ?? "")
+        const { id } = jwt.verify(token, JWT_SECRET)
         // @ts-ignore
         socket.idUser = id
       }
