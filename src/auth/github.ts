@@ -1,10 +1,6 @@
 import axios from "axios"
-import {
-  ID_CLIENT,
-  APP_BASE_URL,
-  CALLBACK_PATH,
-  CLIENT_SECRET,
-} from "./constants"
+import { CLIENT_SECRET } from "../constants"
+import { ID_CLIENT, APP_BASE_URL, CALLBACK_PATH } from "./constants"
 
 type CommonError = {
   message: string
