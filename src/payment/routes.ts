@@ -3,8 +3,7 @@ import { app } from "../app"
 import { authenticate } from "../auth/authenticate"
 import { STRIPE_YEARLY_ID } from "./constants"
 import { checkout, createEvent, getPortalLink } from "./stripe"
-
-const { updateUser } = require("../controllers")
+import { updateUser } from "../controllers/user"
 
 module.exports = () => {
   app.get("/subscriptions", authenticate, async (_: Request, res: Response) => {
