@@ -8,7 +8,7 @@
     "node": "16.x"
   },
   "scripts": {
-    "start": "node src/index.ts"
+    "start": "node dist/index.js"
   },
   "repository": {
     "type": "git",
