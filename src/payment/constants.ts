@@ -5,5 +5,5 @@ export const STRIPE_API_KEY = process.env.STRIPE_TEST_KEY ?? ""
 
 export enum PlanPeriods {
   Monthly = "monthly",
-  Yearly = "yearly",
+  Yearly = "annual",
 }

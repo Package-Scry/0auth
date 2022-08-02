@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express"
 import { app } from "../app"
 import { authenticate } from "../auth/authenticate"
-import { STRIPE_YEARLY_ID } from "./constants"
+import { PlanPeriods, STRIPE_YEARLY_ID } from "./constants"
 import { checkout, createEvent, getPortalLink } from "./stripe"
 import { updateUser } from "../controllers/user"
 
@@ -66,8 +66,8 @@ module.exports = () => {
             const period =
               // @ts-ignore
               dataObject.lines.data[0].price.id === STRIPE_YEARLY_ID
-                ? "annual"
-                : "monthly"
+                ? PlanPeriods.Yearly
+                : PlanPeriods.Monthly
 
             await updateUser({ id: idUser, hasPro: true, period })
           }
