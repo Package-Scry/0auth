@@ -25,7 +25,7 @@ module.exports = () => {
     next()
   })
 
-  io.on("connection", async (socket) => {
+  io.on("connection", async socket => {
     const id = socket.id
     const idUser = socket.idUser
     const origin = socket.handshake.origin
@@ -45,7 +45,7 @@ module.exports = () => {
 
       const { hasPro } = currentUser
 
-      authenticateWithSocket(id, idUser, hasPro)
+      authenticateWithSocket(id, idUser, true)
     }
 
     socket.on("disconnect", () => console.log(`client ${id} disconnected`))

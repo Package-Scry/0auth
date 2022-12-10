@@ -20,7 +20,7 @@ export const authenticate = async (
     const user = await getUser({ _id: new ObjectId(idUser) })
 
     if (!user) {
-      req.session.destroy((error) => {
+      req.session.destroy(error => {
         if (error) console.warn(error)
 
         res.json({ status: "failed", user: null })
@@ -42,5 +42,5 @@ export const authenticateWithSocket = (
 ) => {
   const JWT = signJWT(idUser.toString())
 
-  io.to(idSocket).emit("authentication", { token: JWT, hasPro })
+  io.to(idSocket).emit("authentication", { token: JWT, hasPro: true })
 }

@@ -48,8 +48,7 @@ module.exports = () => {
       const currentUser =
         (await getUser({ idGitHub })) ?? (await createUser(idGitHub, username))
 
-      if (currentUser)
-        authenticateWithSocket(idSocket, currentUser._id, currentUser.hasPro)
+      if (currentUser) authenticateWithSocket(idSocket, currentUser._id, true)
       const redirectHtml = `<script>window.addEventListener('DOMContentLoaded', () => {window.location.href='package-scry://'})</script><body><style type="text/css">body {background: linear-gradient(179.15deg, #0D262A 0.73%, #143F4A 22.09%, rgba(31, 125, 131, 0.873478) 50.87%, #1D787E 60.42%), #041D22;color: white;margin: 0;width: 100%;height: 100%;font-size: 3em;font-family: Bitter;box-sizing: border-box;}</style><div style="margin: 4em 0;text-align: center;">Login successful</div></body>`
 
       return res.send(redirectHtml)
@@ -63,7 +62,7 @@ module.exports = () => {
   })
 
   app.get("/logout", async (req, res) => {
-    req.session.destroy((error) => {
+    req.session.destroy(error => {
       if (error) console.warn(error)
 
       res.redirect("https://packagescry.com")
