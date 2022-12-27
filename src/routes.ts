@@ -17,11 +17,11 @@ module.exports = () => {
 
   app.get("/latest", async (_: Request, res: Response) => {
     try {
-      const url =
-        "https://package-scry.sfo3.digitaloceanspaces.com/releases/latest-mac.yml"
-      const response = await axios.get(url)
-      const doc = yaml.load(response.data) as { version: string }
-      const macUrl = `https://package-scry.sfo3.digitaloceanspaces.com/releases/Package%20Scry-${doc.version}.dmg`
+      // const url =
+      //   "https://package-scry.sfo3.digitaloceanspaces.com/releases/latest-mac.yml"
+      // const response = await axios.get(url)
+      // const doc = yaml.load(response.data) as { version: string }
+      const macUrl = `https://pub-8f3af367d697418e93a97976b927f3f2.r2.dev/Package%20Scry-1.0.0-arm64.dmg`
 
       res.json({ status: "success", url: { mac: macUrl } })
     } catch (error) {
